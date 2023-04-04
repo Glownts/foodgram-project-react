@@ -121,8 +121,16 @@ class Recipe(models.Model):
 class RecipeTag(models.Model):
     '''Many-to-many field model for tags and recipes.'''
 
-    recipe = models.ForeignKey('recipe', Recipe, on_delete=models.CASCADE)
-    tag = models.ForeignKey('tag in recipe', Tag, on_delete=models.CASCADE)
+    recipe = models.ForeignKey(
+        'recipe',
+        Recipe,
+        on_delete=models.CASCADE
+    )
+    tag = models.ForeignKey(
+        'tag in recipe',
+        Tag,
+        on_delete=models.CASCADE
+    )
 
 
 class IngredientRecipe(models.Model):
