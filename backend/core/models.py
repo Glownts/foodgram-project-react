@@ -3,7 +3,7 @@ from users.models import User
 from recipes.models import Recipe
 
 
-class Shopping_cartAndFavorite(models.Model):
+class ShoppingCartAndFavorite(models.Model):
     user = models.ForeignKey(
         'user',
         User,
@@ -18,6 +18,11 @@ class Shopping_cartAndFavorite(models.Model):
         related_name='shopping_cart',
         null=False
     )
+    added = models.DateTimeField('time of adding', auto_now_add=True)
 
     class Meta:
         unique_together = ('user', 'recipe',)
+        ordering = ["-added"]
+
+    def __str__(self):
+        return f"{self.user} added {self.recipe}"
