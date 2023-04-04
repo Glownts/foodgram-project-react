@@ -1,3 +1,5 @@
+"""App config for recipes app."""
+
 from django.apps import AppConfig
 
 

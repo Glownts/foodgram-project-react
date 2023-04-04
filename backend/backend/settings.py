@@ -1,6 +1,5 @@
 """
 Django settings for backend project.
-
 """
 
 import os
