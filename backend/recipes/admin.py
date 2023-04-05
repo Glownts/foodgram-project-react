@@ -4,8 +4,8 @@ Admin zone config.
 
 from django.contrib import admin
 
-from .models import (Recipe, Ingredient, RecipeTag,
-                     IngredientRecipe, ShoppingCart, Favorite, Tag)
+from .models import (Favorite, Ingredient, IngredientRecipe, Recipe, RecipeTag,
+                     ShoppingCart, Tag)
 
 
 @admin.register(Recipe)

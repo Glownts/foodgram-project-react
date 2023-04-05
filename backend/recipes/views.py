@@ -2,28 +2,27 @@
 View-functions of recipe app.
 """
 
-from rest_framework.viewsets import ModelViewSet
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.filters import SearchFilter
-from rest_framework.pagination import PageNumberPagination
-from rest_framework.decorators import action
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework import status
-
 from django.conf import settings
-from django.http import HttpResponse
 from django.db.models import Sum
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import status
+from rest_framework.decorators import action
+from rest_framework.filters import SearchFilter
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.viewsets import ModelViewSet
 
-from .permissions import AdminOrReadOnly, AuthorAdminOrReadOnly
 from .filters import RecipeFilter
-from .models import (Tag, Ingredient, Recipe, Favorite, ShoppingCart,
-                     IngredientRecipe)
-from .serializers import (TagSerializer, IngredientSerializer,
-                          RecipeSerializer, RecipeCreateSerializer,
-                          FavoriteSerializer, ShoppingCartSerializer)
+from .models import (Favorite, Ingredient, IngredientRecipe, Recipe,
+                     ShoppingCart, Tag)
+from .permissions import AdminOrReadOnly, AuthorAdminOrReadOnly
+from .serializers import (FavoriteSerializer, IngredientSerializer,
+                          RecipeCreateSerializer, RecipeSerializer,
+                          ShoppingCartSerializer, TagSerializer)
 
 
 class TagViewSet(ModelViewSet):

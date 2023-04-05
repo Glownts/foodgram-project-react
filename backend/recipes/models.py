@@ -4,10 +4,11 @@ wish-lists and favorites.
 """
 
 from django.conf import settings
-from django.db import models
-from users.models import User
-from core.models import ShoppingCartAndFavorite
 from django.core.validators import MinValueValidator
+from django.db import models
+
+from core.models import ShoppingCartAndFavorite
+from users.models import User
 
 
 class Tag(models.Model):

@@ -3,12 +3,10 @@ Django settings for backend project.
 """
 
 import os
-
+from datetime import timedelta
 from pathlib import Path
 
 from dotenv import load_dotenv
-
-from datetime import timedelta
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
