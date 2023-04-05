@@ -1,27 +1,45 @@
+"""
+Models of core app. Contain model standart model for ShoppingCart and
+Favorite models.
+"""
+
 from django.db import models
 from users.models import User
 from recipes.models import Recipe
 
 
 class ShoppingCartAndFavorite(models.Model):
+    """
+    Standart model for ShoppingCart and
+    Favorite models.
+
+    Uses for creating many-to-many connections between tags and recipes.
+
+    Fields: user, recipe, added.
+
+    The pair "user" and "recipe" must be unique.
+
+    "added" is the time of adding recipe in this category.
+    It set automatically.
+
+    Used ordering by "-added" field.
+    """
     user = models.ForeignKey(
-        'user',
+        "user",
         User,
         on_delete=models.CASCADE,
-        related_name='shopping_cart',
         null=False
     )
     recipe = models.ForeignKey(
-        'recipe',
+        "recipe",
         Recipe,
         on_delete=models.CASCADE,
-        related_name='shopping_cart',
         null=False
     )
-    added = models.DateTimeField('time of adding', auto_now_add=True)
+    added = models.DateTimeField("time of adding", auto_now_add=True)
 
     class Meta:
-        unique_together = ('user', 'recipe',)
+        unique_together = ("user", "recipe",)
         ordering = ["-added"]
 
     def __str__(self):

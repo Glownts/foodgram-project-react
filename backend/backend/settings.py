@@ -27,9 +27,10 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "core.apps.CoreConfig"
-    "recipes.apps.RecipesConfig"
-    "users.apps.UsersConfig"
+    "core.apps.CoreConfig",
+    "recipes.apps.RecipesConfig",
+    "users.apps.UsersConfig",
+    "rest_framework",
 ]
 
 MIDDLEWARE = [
@@ -108,3 +109,9 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+NAME_MAX_LENG = 128
+MEASUREMENT_MAX_LENG = 32
+COLOR_MAX_LENG = 7
+EMAIL_MAX_LENG = 256
+ROLE_MAX_LENG = 5

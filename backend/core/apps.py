@@ -1,4 +1,6 @@
-"""App config for core app."""
+"""
+App config for core app.
+"""
 
 from django.apps import AppConfig
 
