@@ -33,7 +33,7 @@ class User(AbstractUser):
     username = models.CharField(
         "username",
         validators=(UnicodeUsernameValidator(),),
-        max_length=settings.NAME_MAX_LENG,
+        max_length=settings.USER_MAX_LENG,
         unique=True,
         help_text=("The set of characters is no more "
                    f"than {settings.NAME_MAX_LENG}."
@@ -48,14 +48,14 @@ class User(AbstractUser):
         unique=True,
     )
     first_name = models.CharField(
-        "first name",
-        max_length=settings.NAME_MAX_LENG,
+        "first_name",
+        max_length=settings.USER_MAX_LENG,
         null=False,
         blank=False
     )
     last_name = models.CharField(
-        "last name",
-        max_length=settings.NAME_MAX_LENG,
+        "last_name",
+        max_length=settings.USER_MAX_LENG,
         null=False,
         blank=False
     )

@@ -7,6 +7,7 @@ from django.conf import settings
 from django.db import models
 from users.models import User
 from core.models import ShoppingCartAndFavorite
+from django.core.validators import MinValueValidator
 
 
 class Tag(models.Model):
@@ -54,6 +55,7 @@ class Tag(models.Model):
     )
     slug = models.SlugField(
         "slug",
+        max_length=settings.SLUG_MAX_LENG,
         unique=True,
         null=False
     )
@@ -154,7 +156,13 @@ class Recipe(models.Model):
         "text",
         null=False
     )
-    cooking_time = models.PositiveSmallIntegerField("cooking_time")
+    cooking_time = models.PositiveSmallIntegerField(
+        "cooking_time",
+        default=1,
+        validators=[
+            MinValueValidator(1)
+        ]
+    )
     pub_date = models.DateTimeField("publication date", auto_now_add=True)
 
     class Meta:
@@ -177,7 +185,7 @@ class RecipeTag(models.Model):
         on_delete=models.CASCADE
     )
     tag = models.ForeignKey(
-        "tag in recipe",
+        "tag",
         Tag,
         on_delete=models.CASCADE
     )
@@ -194,7 +202,7 @@ class IngredientRecipe(models.Model):
     """
 
     ingredient = models.ForeignKey(
-        "ingredient in recipe",
+        "ingredient",
         Ingredient,
         on_delete=models.CASCADE
     )
@@ -204,7 +212,7 @@ class IngredientRecipe(models.Model):
         on_delete=models.CASCADE
     )
     amount = models.PositiveIntegerField(
-        "amout of ingredient",
+        "amount",
         null=False
     )
 
