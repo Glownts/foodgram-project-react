@@ -31,7 +31,7 @@ class User(AbstractUser):
         ADMIN = "admin", "ADMIN"
 
     username = models.CharField(
-        "username",
+        verbose_name="username",
         validators=(UnicodeUsernameValidator(),),
         max_length=settings.USER_MAX_LENG,
         unique=True,
@@ -43,31 +43,31 @@ class User(AbstractUser):
         },
     )
     email = models.EmailField(
-        "email",
+        verbose_name="email",
         max_length=settings.EMAIL_MAX_LENG,
         unique=True,
     )
     first_name = models.CharField(
-        "first_name",
+        verbose_name="first_name",
         max_length=settings.USER_MAX_LENG,
         null=False,
         blank=False
     )
     last_name = models.CharField(
-        "last_name",
+        verbose_name="last_name",
         max_length=settings.USER_MAX_LENG,
         null=False,
         blank=False
     )
     role = models.CharField(
-        "role",
+        verbose_name="role",
         max_length=settings.ROLE_MAX_LENG,
         choices=Roles.choices,
         default=Roles.USER,
         blank=True
     )
     bio = models.TextField(
-        "biography",
+        verbose_name="biography",
         blank=True,
     )
 
@@ -109,14 +109,16 @@ class Follow(models.Model):
 
     user = models.ForeignKey(
         User,
-        on_delete=models.CASCADE,
+        verbose_name="follower",
         related_name="follower",
+        on_delete=models.CASCADE,
         null=False
     )
     author = models.ForeignKey(
         User,
-        on_delete=models.CASCADE,
+        verbose_name="content_maker",
         related_name="content_maker",
+        on_delete=models.CASCADE,
         null=False
     )
 

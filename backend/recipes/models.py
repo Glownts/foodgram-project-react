@@ -7,7 +7,6 @@ from django.conf import settings
 from django.core.validators import MinValueValidator
 from django.db import models
 
-from core.models import ShoppingCartAndFavorite
 from users.models import User
 
 
@@ -42,20 +41,20 @@ class Tag(models.Model):
     ]
 
     name = models.CharField(
-        "name",
+        verbose_name="name",
         max_length=settings.NAME_MAX_LENG,
         unique=True,
         null=False
     )
     color = models.CharField(
-        "color",
+        verbose_name="color",
         max_length=settings.COLOR_MAX_LENG,
         choices=COLOR_CHOICES,
         unique=True,
         null=False
     )
     slug = models.SlugField(
-        "slug",
+        verbose_name="slug",
         max_length=settings.SLUG_MAX_LENG,
         unique=True,
         null=False
@@ -63,6 +62,8 @@ class Tag(models.Model):
 
     class Meta:
         ordering = ("name",)
+        verbose_name = "Tag"
+        verbose_name_plural = "Tags"
 
     def __str__(self):
         return self.name
@@ -81,18 +82,20 @@ class Ingredient(models.Model):
     """
 
     name = models.CharField(
-        "name",
+        verbose_name="name",
         max_length=settings.NAME_MAX_LENG,
         null=False
     )
     measurement_unit = models.CharField(
-        "measurement_unit",
+        verbose_name="measurement_unit",
         max_length=settings.MEASUREMENT_MAX_LENG,
         null=False
     )
 
     class Meta:
         ordering = ("name",)
+        verbose_name = "Ingredient"
+        verbose_name_plural = "Ingredients"
 
     def __str__(self):
         return self.name
@@ -121,53 +124,51 @@ class Recipe(models.Model):
     """
 
     tags = models.ManyToManyField(
-        "tags",
         Tag,
-        on_delete=models.CASCADE,
+        verbose_name="tags",
         through="RecipeTag",
-        related_name="recipes",
+        related_name="tag_in_recipe",
     )
     author = models.ForeignKey(
-        "author",
         User,
+        verbose_name="author",
         on_delete=models.SET_DEFAULT,
         default="User deleted",
-        related_name="recipes",
+        related_name="author_of_recipe",
         null=False,
     )
     ingredients = models.ManyToManyField(
-        "ingredients",
         Ingredient,
-        on_delete=models.CASCADE,
+        verbose_name="ingredients",
         through="IngredientRecipe",
-        related_name="recipes"
+        related_name="ingredients_for_recipe"
     )
     name = models.CharField(
-        "name",
+        verbose_name="name",
         max_length=settings.NAME_MAX_LENG,
         null=False
     )
     image = models.ImageField(
-        "image",
+        verbose_name="image",
         upload_to="recipes/",
         blank=False,
         null=False
     )
     text = models.TextField(
-        "text",
+        verbose_name="text",
         null=False
     )
     cooking_time = models.PositiveSmallIntegerField(
-        "cooking_time",
+        verbose_name="cooking_time",
         default=1,
-        validators=[
-            MinValueValidator(1)
-        ]
+        validators=[MinValueValidator(1)]
     )
     pub_date = models.DateTimeField("publication date", auto_now_add=True)
 
     class Meta:
         ordering = ("-pub_date",)
+        verbose_name = "Recipe"
+        verbose_name_plural = "Recipes"
 
     def __str__(self):
         return self.name
@@ -181,15 +182,19 @@ class RecipeTag(models.Model):
     """
 
     recipe = models.ForeignKey(
-        "recipe",
         Recipe,
+        verbose_name="recipe",
         on_delete=models.CASCADE
     )
     tag = models.ForeignKey(
-        "tag",
         Tag,
+        verbose_name="tag",
         on_delete=models.CASCADE
     )
+
+    class Meta:
+        verbose_name = "Tags in recipe"
+        verbose_name_plural = verbose_name
 
 
 class IngredientRecipe(models.Model):
@@ -203,28 +208,29 @@ class IngredientRecipe(models.Model):
     """
 
     ingredient = models.ForeignKey(
-        "ingredient",
         Ingredient,
+        verbose_name="ingredient",
         on_delete=models.CASCADE
     )
     recipe = models.ForeignKey(
-        "recipe",
         Recipe,
+        verbose_name="recipe",
         on_delete=models.CASCADE
     )
     amount = models.PositiveIntegerField(
-        "amount",
+        verbose_name="amount",
         null=False
     )
 
+    class Meta:
+        verbose_name = "Ingredients in recipe"
+        verbose_name_plural = verbose_name
 
-class ShoppingCart(ShoppingCartAndFavorite):
+
+class ShoppingCart(models.Model):
     """
     Recipes to buy.
 
-    Uses standart model from core app. Related names for fields "user"
-    and "recipe" overrided.
-
     Fields: user, recipe, added.
 
     The pair "user" and "recipe" must be unique.
@@ -235,17 +241,36 @@ class ShoppingCart(ShoppingCartAndFavorite):
     Used ordering by "-added" field.
     """
 
-    user = models.ForeignKey(related_name="shopping_cart")
-    recipe = models.ForeignKey(related_name="shopping_cart")
+    user = models.ForeignKey(
+        User,
+        verbose_name="user",
+        related_name="users_shopping_cart",
+        on_delete=models.CASCADE,
+        null=False
+    )
+    recipe = models.ForeignKey(
+        Recipe,
+        verbose_name="recipe",
+        related_name="recipe_in_shopping_cart",
+        on_delete=models.CASCADE,
+        null=False
+    )
+    added = models.DateTimeField("time of adding", auto_now_add=True)
+
+    class Meta:
+        unique_together = ("user", "recipe",)
+        ordering = ["-added"]
+        verbose_name = "Recipes in shopping cart"
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return f"{self.user} added {self.recipe}"
 
 
-class Favorite(ShoppingCartAndFavorite):
+class Favorite(models.Model):
     """
     Favorite recipes.
 
-    Uses standart model from core app. Related names for fields "user"
-    and "recipe" overrided.
-
     Fields: user, recipe, added.
 
     The pair "user" and "recipe" must be unique.
@@ -256,5 +281,27 @@ class Favorite(ShoppingCartAndFavorite):
     Used ordering by "-added" field.
     """
 
-    user = models.ForeignKey(related_name="favorite")
-    recipe = models.ForeignKey(related_name="favorite")
+    user = models.ForeignKey(
+        User,
+        verbose_name="user",
+        related_name="users_favorite",
+        on_delete=models.CASCADE,
+        null=False
+    )
+    recipe = models.ForeignKey(
+        Recipe,
+        verbose_name="recipe",
+        related_name="recipes_in_favorite",
+        on_delete=models.CASCADE,
+        null=False
+    )
+    added = models.DateTimeField("time of adding", auto_now_add=True)
+
+    class Meta:
+        unique_together = ("user", "recipe",)
+        ordering = ["-added"]
+        verbose_name = "Recipes in favorite"
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return f"{self.user} added {self.recipe}"

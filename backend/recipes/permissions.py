@@ -28,7 +28,7 @@ class AdminOrReadOnly(permissions.BasePermission):
 
 class AuthorAdminOrReadOnly(permissions.BasePermission):
     """
-    Granted full permission for admin or author.Other users can only
+    Granted full permission for admin or author. Other users can only
     read.
     """
 

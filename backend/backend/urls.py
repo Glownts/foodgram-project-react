@@ -3,7 +3,7 @@ Root URL"s configuration for backend project.
 
 Admin zone located on /admin/.
 
-/redoc/ to see API documentation.
+api/docs/ to see API documentation.
 
 /api/ for interaction with recipe app through API.
 
