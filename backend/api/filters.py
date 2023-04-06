@@ -1,5 +1,5 @@
 """
-Filters for views recipe app.
+Filters for views.
 """
 from django_filters.rest_framework import FilterSet, filters
 

@@ -1,5 +1,5 @@
 """
-View-functions of recipe app.
+View-functions.
 """
 
 from django.conf import settings
@@ -11,21 +11,28 @@ from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
 from recipes.models import (Favorite, Ingredient, IngredientRecipe, Recipe,
                             ShoppingCart, Tag)
-from users.models import User
+from users.models import User, Subscription
 
 from .filters import RecipeFilter
+from .mixins import CreateListRetrievViewSet
 from .permissions import AdminOrReadOnly, AuthorAdminOrReadOnly
 from .serializers import (FavoriteSerializer, IngredientSerializer,
                           RecipeCreateSerializer, RecipeSerializer,
                           ShoppingCartSerializer, TagSerializer,
-                          UserSerializer)
+                          UserSerializer, UserCreateSerializer,
+                          PasswordSerializer, SubscriptionsSerializer,
+                          SubscribeSerializer)
+
+# -----------------------------------------------------------------------------
+#                            Recipe app
+# -----------------------------------------------------------------------------
 
 
 class TagViewSet(ModelViewSet):
@@ -34,6 +41,7 @@ class TagViewSet(ModelViewSet):
 
     Has no pagination. Only admin can change this model.
     """
+
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     permission_classes = (AdminOrReadOnly,)
@@ -47,6 +55,7 @@ class IngredientViewSet(ModelViewSet):
     Has no pagination. Only admin can change this model.
     Has searching by name without register sensitivity.
     """
+
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     permission_classes = (AdminOrReadOnly,)
@@ -66,6 +75,7 @@ class RecipeViewSet(ModelViewSet):
     Has method "get_serializer_class" to select serializer by
     http method.
     """
+
     queryset = Recipe.objects.all()
     permission_classes = (AuthorAdminOrReadOnly,)
     filter_backends = (DjangoFilterBackend,)
@@ -73,11 +83,15 @@ class RecipeViewSet(ModelViewSet):
     pagination_class = PageNumberPagination
 
     def get_serializer_class(self):
+        """Defines which serializer need to use."""
+
         if self.request.method in ("POST", "PATCH",):
             return RecipeCreateSerializer
         return RecipeSerializer
 
     def get_serializer_context(self):
+        """Add serializer's context."""
+
         context = super().get_serializer_context()
         context.update({"request": self.request})
         return context
@@ -91,11 +105,14 @@ class FavoriteViewSet(APIView):
 
     Has action method "favorite" to add and delete recipes from favorite.
     """
+
     permission_classes = (IsAuthenticated,)
     pagination_class = None
 
     @action(detail=True, methods=["post", "delete"])
     def favorite(self, request, **kwargs):
+        """Add or delete recipe in favorite list."""
+
         recipe = get_object_or_404(Recipe, id=kwargs["pk"])
 
         if request.method == "POST":
@@ -104,7 +121,8 @@ class FavoriteViewSet(APIView):
             if serializer.is_valid():
                 if not Favorite.objects.filter(user=request.user,
                                                recipe=recipe).exists():
-                    serializer.save()
+                    Favorite.objects.create(user=request.user,
+                                            recipe=recipe)
                     return Response(serializer.data,
                                     status=status.HTTP_201_CREATED)
             return Response({"errors": "Рецепт уже в избранном."},
@@ -123,15 +141,18 @@ class ShoppingCartViewSet(APIView):
 
     Has no pagination. Only authenticated users can change this model.
 
-    Has two action methods "shopping_cart" to add and delete recipes from
+    Has two action-methods: "shopping_cart" to add and delete recipes from
     shopping list and "download_shopping_cart" to download recipes's
     ingredients in .txt file.
     """
+
     permission_classes = (IsAuthenticated,)
     pagination_class = None
 
     @action(detail=True, methods=["post", "delete"])
     def shopping_cart(self, request, **kwargs):
+        """Add or delete recipe in shoplist."""
+
         recipe = get_object_or_404(Recipe, id=kwargs["pk"])
 
         if request.method == "POST":
@@ -140,7 +161,8 @@ class ShoppingCartViewSet(APIView):
             if serializer.is_valid():
                 if not ShoppingCart.objects.filter(user=request.user,
                                                    recipe=recipe).exists():
-                    serializer.save()
+                    ShoppingCart.objects.create(user=request.user,
+                                                recipe=recipe)
                     return Response(serializer.data,
                                     status=status.HTTP_201_CREATED)
             return Response({"errors": "Рецепт уже в списке покупок."},
@@ -156,6 +178,8 @@ class ShoppingCartViewSet(APIView):
 
     @action(detail=False, methods=["get"])
     def download_shopping_cart(self, request, **kwargs):
+        """Download shoplist in .txt format."""
+
         ingredients = (
             IngredientRecipe.objects
             .filter(recipe__recipe_in_shopping_cart__user=request.user)
@@ -176,8 +200,84 @@ class ShoppingCartViewSet(APIView):
         )
         return file
 
+# -----------------------------------------------------------------------------
+#                            Users app
+# -----------------------------------------------------------------------------
 
-class UserViewSet(ModelViewSet):
+
+class UserViewSet(CreateListRetrievViewSet):
+    """
+    Viewset for User model.
+
+    Has standart pagination. Any users can gat safe methods.
+
+    Has four action-methods: "me" - to define current user,
+    "set_password" - allow users to change their passwords,
+    "subscription" and "subscribe" - to check user's subscription,
+    follow or unfollow authors.
+    """
+
     queryset = User.objects.all()
-    serializer_class = UserSerializer
-    permission_classes = (AdminOrReadOnly,)
+    permission_classes = (AllowAny,)
+    pagination_class = PageNumberPagination
+
+    def get_serializer_class(self):
+        """Defines which serializer need to use."""
+
+        if self.request.method == "GET":
+            return UserSerializer
+        return UserCreateSerializer
+
+    @action(methods=["get"], detail=False,
+            pagination_class=None,
+            permission_classes=[IsAuthenticated])
+    def me(self, request):
+        """Defines current user."""
+
+        serializer = UserSerializer(request.user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(methods=["post"], detail=False,
+            permission_classes=[IsAuthenticated])
+    def set_password(self, request):
+        """Allows users to change their passwords."""
+
+        serializer = PasswordSerializer(request.user, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'detail': 'Пароль успешно изменен!'},
+                            status=status.HTTP_204_NO_CONTENT)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(methods=["get"], detail=False,
+            permission_classes=[IsAuthenticated],
+            pagination_class=PageNumberPagination)
+    def subscriptions(self, request):
+        """Shows user's subscriptions."""
+
+        subscriptions = Subscription.objects.filter(user=request.user)
+        page = self.paginate_queryset(subscriptions)
+        serializer = SubscriptionsSerializer(page, many=True,
+                                             context={'request': request})
+        return self.get_paginated_response(serializer.data)
+
+    @action(methods=["post", "delete"], detail=False,
+            permission_classes=[IsAuthenticated])
+    def subscribe(self, request, **kwargs):
+        """Allows the user to follow and unfollow authors."""
+
+        author = get_object_or_404(User, id=kwargs["pk"])
+
+        if request.method == 'POST':
+            serializer = SubscribeSerializer(author, data=request.data,
+                                             context={"request": request})
+            if serializer.is_valid():
+                Subscription.objects.create(user=request.user, author=author)
+                return Response(serializer.data,
+                                status=status.HTTP_201_CREATED)
+
+        if request.method == 'DELETE':
+            get_object_or_404(Subscription, user=request.user,
+                              author=author).delete()
+            return Response({'detail': 'Вы успешно отказались от подписки'},
+                            status=status.HTTP_204_NO_CONTENT)

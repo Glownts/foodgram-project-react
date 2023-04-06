@@ -1,3 +1,12 @@
+"""
+View-functions.
+"""
+
+# -----------------------------------------------------------------------------
+#                            Recipe app
+# -----------------------------------------------------------------------------
+
+
 class FavoriteSerializer():
     pass
 
@@ -21,6 +30,26 @@ class ShoppingCartSerializer():
 class TagSerializer():
     pass
 
+# -----------------------------------------------------------------------------
+#                            Users app
+# -----------------------------------------------------------------------------
+
 
 class UserSerializer():
+    pass
+
+
+class UserCreateSerializer():
+    pass
+
+
+class PasswordSerializer():
+    pass
+
+
+class SubscriptionsSerializer():
+    pass
+
+
+class SubscribeSerializer():
     pass

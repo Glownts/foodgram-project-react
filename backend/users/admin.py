@@ -4,7 +4,7 @@ Admin zone config.
 
 from django.contrib import admin
 
-from .models import Follow, User
+from .models import Subscription, User
 
 
 @admin.register(User)
@@ -24,9 +24,9 @@ class UserAdmin(admin.ModelAdmin):
     list_editable = ("__all__",)
 
 
-@admin.register(Follow)
-class FollowAdmin(admin.ModelAdmin):
-    """Admin zone registration for Follow model."""
+@admin.register(Subscription)
+class SubscriptionAdmin(admin.ModelAdmin):
+    """Admin zone registration for Subscription model."""
 
     list_display = ("id", "user", "author",)
     search_fields = ("author", "user",)

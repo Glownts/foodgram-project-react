@@ -1,6 +1,6 @@
 
 """
-Permissins for recipes app.
+User's permissions.
 """
 
 from rest_framework import permissions

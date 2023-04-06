@@ -95,9 +95,9 @@ class User(AbstractUser):
         return f"{self.username} {self.email} {self.role}"
 
 
-class Follow(models.Model):
+class Subscription(models.Model):
     """
-    Following to authors.
+    Subscription to authors.
 
     Model for creating many-to-many connections between content makers
     and followers.
@@ -109,8 +109,8 @@ class Follow(models.Model):
 
     user = models.ForeignKey(
         User,
-        verbose_name="follower",
-        related_name="follower",
+        verbose_name="subscriber",
+        related_name="subscriber",
         on_delete=models.CASCADE,
         null=False
     )
