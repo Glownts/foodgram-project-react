@@ -30,6 +30,9 @@ class User(AbstractUser):
         USER = "user", "USER"
         ADMIN = "admin", "ADMIN"
 
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = ("username",)
+
     username = models.CharField(
         verbose_name="username",
         validators=(UnicodeUsernameValidator(),),
@@ -72,7 +75,6 @@ class User(AbstractUser):
     )
 
     REQUIRED_FIELDS = (
-        "email",
         "username",
         "first_name",
         "last_name"

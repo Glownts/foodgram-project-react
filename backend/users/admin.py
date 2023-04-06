@@ -1,5 +1,5 @@
 """
-Admin zone config.
+Admin zone config users.
 """
 
 from django.contrib import admin
@@ -18,10 +18,11 @@ class UserAdmin(admin.ModelAdmin):
         "last_name",
         "email",
         "role",
+        "password",
     )
-    search_fields = ("first_name", "last_name", "role")
-    list_filter = ("first_name", "last_name", "email",)
-    list_editable = ("__all__",)
+    search_fields = ("username", "first_name", "last_name", "email",)
+    list_filter = ("username", "first_name", "last_name", "email",)
+    list_editable = ("password",)
 
 
 @admin.register(Subscription)
@@ -29,5 +30,5 @@ class SubscriptionAdmin(admin.ModelAdmin):
     """Admin zone registration for Subscription model."""
 
     list_display = ("id", "user", "author",)
-    search_fields = ("author", "user",)
-    list_editable = ("__all__",)
+    search_fields = ("user", "author",)
+    list_editable = ("user", "author",)

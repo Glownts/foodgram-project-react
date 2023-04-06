@@ -15,7 +15,7 @@ from users.models import Subscription, User
 # -----------------------------------------------------------------------------
 
 
-class UserSerializer():
+class UserSerializer(serializers.ModelSerializer):
     """User info."""
 
     class Meta:
@@ -23,7 +23,7 @@ class UserSerializer():
         fields = ("__all__",)
 
 
-class UserCreateSerializer():
+class UserCreateSerializer(serializers.ModelSerializer):
     """New user creation."""
 
     class Meta:
@@ -43,7 +43,7 @@ class UserCreateSerializer():
         }
 
 
-class PasswordSerializer():
+class PasswordSerializer(serializers.Serializer):
     """Allow user changes password."""
 
     new_password = serializers.CharField(required=True)
@@ -54,7 +54,7 @@ class PasswordSerializer():
         fields = ("__all__",)
 
 
-class SubscribeSerializer():
+class SubscribeSerializer(serializers.ModelSerializer):
     """Allow to subscribe to author."""
 
     user = serializers.PrimaryKeyRelatedField(
@@ -93,7 +93,7 @@ class BaseRecipeSerializer(serializers.ModelSerializer):
         )
 
 
-class SubscriptionsSerializer():
+class SubscriptionsSerializer(serializers.ModelSerializer):
     """User's subscriptions list."""
     recipes = BaseRecipeSerializer(many=True, required=True)
     is_subscribed = serializers.SerializerMethodField("check_if_is_subscribed")
@@ -224,7 +224,7 @@ class AddIngredientRecipeSerializer(serializers.ModelSerializer):
 class RecipeSerializer(serializers.ModelSerializer):
     tags = TagSerializer(read_only=True, many=True)
     image = Base64ImageField()
-    author = UserSerializer()
+    author = UserSerializer(read_only=True)
     ingredients = serializers.SerializerMethodField("get_ingredients")
     is_favorite = serializers.SerializerMethodField("get_is_favorite")
     is_in_shoplist = serializers.SerializerMethodField("get_is_in_shoplist")
