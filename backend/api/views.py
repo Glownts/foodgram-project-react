@@ -16,13 +16,16 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
+from recipes.models import (Favorite, Ingredient, IngredientRecipe, Recipe,
+                            ShoppingCart, Tag)
+from users.models import User
+
 from .filters import RecipeFilter
-from .models import (Favorite, Ingredient, IngredientRecipe, Recipe,
-                     ShoppingCart, Tag)
 from .permissions import AdminOrReadOnly, AuthorAdminOrReadOnly
 from .serializers import (FavoriteSerializer, IngredientSerializer,
                           RecipeCreateSerializer, RecipeSerializer,
-                          ShoppingCartSerializer, TagSerializer)
+                          ShoppingCartSerializer, TagSerializer,
+                          UserSerializer)
 
 
 class TagViewSet(ModelViewSet):
@@ -172,3 +175,9 @@ class ShoppingCartViewSet(APIView):
             f"attachment; filename={settings.FILE_NAME}"
         )
         return file
+
+
+class UserViewSet(ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = (AdminOrReadOnly,)

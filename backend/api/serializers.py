@@ -20,3 +20,7 @@ class ShoppingCartSerializer():
 
 class TagSerializer():
     pass
+
+
+class UserSerializer():
+    pass
