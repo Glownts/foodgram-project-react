@@ -17,6 +17,37 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 
 DEBUG = True
 
+AUTH_USER_MODEL = "users.User"
+
+LANGUAGE_CODE = "ru-RU"
+
+TIME_ZONE = "Europe/Moscow"
+
+USE_I18N = True
+
+USE_TZ = True
+
+
+STATIC_URL = "/static/"
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+
+
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+NAME_MAX_LENG = 200
+USER_MAX_LENG = 150
+MEASUREMENT_MAX_LENG = 200
+SLUG_MAX_LENG = 200
+EMAIL_MAX_LENG = 254
+COLOR_MAX_LENG = 7
+ROLE_MAX_LENG = 5
+OBJECTS_PER_PAGE = 6
+FILE_NAME = "shopping_list.txt"
+
+
 ALLOWED_HOSTS = ["*"]
 
 INSTALLED_APPS = [
@@ -29,7 +60,10 @@ INSTALLED_APPS = [
     "recipes.apps.RecipesConfig",
     "users.apps.UsersConfig",
     "api.apps.ApiConfig",
+    "django_filters",
     "rest_framework",
+    "rest_framework.authtoken",
+    "djoser",
 ]
 
 MIDDLEWARE = [
@@ -90,34 +124,10 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
-LANGUAGE_CODE = "ru-RU"
-
-TIME_ZONE = "Europe/Moscow"
-
-USE_I18N = True
-
-USE_TZ = True
-
-
-STATIC_URL = "/static/"
-STATIC_ROOT = os.path.join(BASE_DIR, "static")
-
-MEDIA_URL = "/media/"
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
-
-
-DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-NAME_MAX_LENG = 200
-USER_MAX_LENG = 150
-MEASUREMENT_MAX_LENG = 200
-SLUG_MAX_LENG = 200
-EMAIL_MAX_LENG = 254
-COLOR_MAX_LENG = 7
-ROLE_MAX_LENG = 5
-OBJECTS_PER_PAGE = 6
-FILE_NAME = "shopping_list.txt"
+DJOSER = {
+    "HIDE_USERS": False,
+    "LOGIN_FIELD": "email",
+}
 
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
@@ -134,5 +144,3 @@ REST_FRAMEWORK = {
     + "PageNumberPagination",
     "PAGE_SIZE": OBJECTS_PER_PAGE,
 }
-
-AUTH_USER_MODEL = "users.User"
