@@ -20,7 +20,8 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ("__all__",)
+        fields = ("username", "email", "first_name", "last_name",
+                  "role", "bio",)
 
 
 class UserCreateSerializer(serializers.ModelSerializer):
@@ -51,7 +52,7 @@ class PasswordSerializer(serializers.Serializer):
 
     class Meta:
         model = User
-        fields = ("__all__",)
+        fields = ("new_password", "current_password",)
 
 
 class SubscribeSerializer(serializers.ModelSerializer):
@@ -143,7 +144,7 @@ class IngredientSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Ingredient
-        fields = ("__all__",)
+        fields = ("name", "measurement_unit",)
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -151,7 +152,7 @@ class TagSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Tag
-        fields = ("__all__",)
+        fields = ("name", "color", "slug",)
 
 
 class FavoriteSerializer(serializers.ModelSerializer):
@@ -166,7 +167,7 @@ class FavoriteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Favorite
-        fields = ("__all__",)
+        fields = ("user", "recipe",)
 
 
 class ShoppingCartSerializer(FavoriteSerializer):
@@ -174,7 +175,7 @@ class ShoppingCartSerializer(FavoriteSerializer):
 
     class Meta:
         model = models.ShoppingCart
-        fields = ("__all__",)
+        fields = ("user", "recipe",)
 
 
 class IngredientRecipeSerialize(serializers.ModelSerializer):
@@ -206,7 +207,7 @@ class RecipeTag(serializers.ModelSerializer):
 
     class Meta:
         model = models.RecipeTag
-        fields = ("__all__",)
+        fields = ("recipe", "tag",)
 
 
 class AddIngredientRecipeSerializer(serializers.ModelSerializer):
