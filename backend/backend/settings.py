@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-dotenv_path = os.path.join(BASE_DIR, ".env")
+dotenv_path = os.path.join(BASE_DIR, "../infra/.env")
 if os.path.exists(dotenv_path):
     load_dotenv(dotenv_path)
 
@@ -36,6 +36,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+CSRF_TRUSTED_ORIGINS = ['https://*.127.0.0.1']
 
 NAME_MAX_LENG = 200
 USER_MAX_LENG = 150
@@ -98,9 +100,13 @@ WSGI_APPLICATION = "backend.wsgi.application"
 
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+    'default': {
+        'ENGINE': os.getenv('DB_ENGINE',),
+        'NAME': os.getenv('DB_NAME',),
+        'USER': os.getenv('POSTGRES_USER',),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD',),
+        'HOST': os.getenv('DB_HOST',),
+        'PORT': os.getenv('DB_PORT',)
     }
 }
 
