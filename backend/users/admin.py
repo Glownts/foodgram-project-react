@@ -17,7 +17,6 @@ class UserAdmin(admin.ModelAdmin):
         "first_name",
         "last_name",
         "email",
-        "role",
         "password",
     )
     search_fields = ("username", "first_name", "last_name", "email",)

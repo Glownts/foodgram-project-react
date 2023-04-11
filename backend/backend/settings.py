@@ -7,6 +7,33 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
+# -----------------------------------------------------------------------------
+#                            Changable settings
+# -----------------------------------------------------------------------------
+
+NAME_MAX_LENG = 200
+USER_MAX_LENG = 150
+TEXT_MAX_LENG = 1000
+MEASUREMENT_MAX_LENG = 200
+SLUG_MAX_LENG = 200
+EMAIL_MAX_LENG = 254
+COLOR_MAX_LENG = 7
+ROLE_MAX_LENG = 5
+
+COOKING_TIME_MIN = 1
+COOKING_TIME_MAX = 300
+
+MIN_AMOUNT_INGREDIENTS = 1
+MAX_AMOUNT_INGREDIENTS = 5000
+
+OBJECTS_PER_PAGE = 6
+
+FILE_NAME = "shopping_list.txt"
+
+# -----------------------------------------------------------------------------
+#                            Base settings
+# -----------------------------------------------------------------------------
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 dotenv_path = os.path.join(BASE_DIR, "../infra/.env")
@@ -36,18 +63,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
 CSRF_TRUSTED_ORIGINS = ['http://localhost']
-
-NAME_MAX_LENG = 200
-USER_MAX_LENG = 150
-MEASUREMENT_MAX_LENG = 200
-SLUG_MAX_LENG = 200
-EMAIL_MAX_LENG = 254
-COLOR_MAX_LENG = 7
-ROLE_MAX_LENG = 5
-OBJECTS_PER_PAGE = 6
-FILE_NAME = "shopping_list.txt"
 
 
 ALLOWED_HOSTS = ["*"]
@@ -130,9 +146,21 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+
 DJOSER = {
-    "HIDE_USERS": False,
-    "LOGIN_FIELD": "email",
+    'HIDE_USERS': False,
+    'PERMISSIONS': {
+        'resipe': ('api.permissions.AuthorAdminOrReadOnly,',),
+        'recipe_list': ('api.permissions.AuthorAdminOrReadOnly',),
+        'user': ('api.permissions.AuthorAdminOrReadOnly',),
+        'user_list': ('api.permissions.AuthorAdminOrReadOnly',),
+    },
+    'SERIALIZERS': {
+        'user': 'api.serializers.UserSerializer',
+        'user_list': 'api.serializers.UserSerializer',
+        'current_user': 'api.serializers.UserSerializer',
+        'user_create': 'api.serializers.UserSerializer',
+    },
 }
 
 REST_FRAMEWORK = {

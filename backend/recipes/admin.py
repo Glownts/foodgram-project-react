@@ -26,24 +26,6 @@ class IngredientAdmin(admin.ModelAdmin):
     list_editable = ("name", "measurement_unit",)
 
 
-@admin.register(models.RecipeTag)
-class RecipeTagAdmin(admin.ModelAdmin):
-    """Admin zone registration for RecipeTag model."""
-
-    list_display = ("id", "recipe", "tag",)
-    search_fields = ("recipe",)
-    list_editable = ("recipe", "tag",)
-
-
-@admin.register(models.IngredientRecipe)
-class IngredientRecipeAdmin(admin.ModelAdmin):
-    """Admin zone registration for IngredientRecipe model."""
-
-    list_display = ("id", "recipe", "ingredient", "amount",)
-    search_fields = ("recipe",)
-    list_editable = ("recipe", "ingredient", "amount",)
-
-
 @admin.register(models.ShoppingCart)
 class ShoppingCartAdmin(admin.ModelAdmin):
     """Admin zone registration for ShoppingCart model."""
