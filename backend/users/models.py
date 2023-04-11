@@ -53,25 +53,19 @@ class User(AbstractUser):
     first_name = models.CharField(
         verbose_name="first_name",
         max_length=settings.USER_MAX_LENG,
-        null=False,
-        blank=False
     )
     last_name = models.CharField(
         verbose_name="last_name",
         max_length=settings.USER_MAX_LENG,
-        null=False,
-        blank=False
     )
     role = models.CharField(
         verbose_name="role",
         max_length=settings.ROLE_MAX_LENG,
         choices=Roles.choices,
         default=Roles.USER,
-        blank=True
     )
     bio = models.TextField(
         verbose_name="biography",
-        blank=True,
     )
 
     REQUIRED_FIELDS = (
@@ -114,14 +108,12 @@ class Subscription(models.Model):
         verbose_name="subscriber",
         related_name="subscriber",
         on_delete=models.CASCADE,
-        null=False
     )
     author = models.ForeignKey(
         User,
         verbose_name="content_maker",
         related_name="content_maker",
         on_delete=models.CASCADE,
-        null=False
     )
 
     class Meta:
