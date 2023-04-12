@@ -22,6 +22,10 @@ class User(AbstractUser):
     is a personal information field.
     """
 
+    class Roles(models.TextChoices):
+        USER = 'user', 'USER'
+        ADMIN = 'admin', 'ADMIN'
+
     email = models.EmailField(
         verbose_name="email",
         max_length=settings.EMAIL_MAX_LENG,
@@ -53,6 +57,13 @@ class User(AbstractUser):
     )
     bio = models.TextField(
         verbose_name="biography",
+    )
+    role = models.CharField(
+        'role',
+        max_length=settings.ROLE_MAX_LENG,
+        choices=Roles.choices,
+        default=Roles.USER,
+        blank=True
     )
 
     USERNAME_FIELD = 'email'
