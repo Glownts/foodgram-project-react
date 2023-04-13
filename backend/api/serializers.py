@@ -107,9 +107,9 @@ class SubscribeSerializer(UserSerializer):
         return True
 
     def get_recipes_count(self, obj):
-        """ Count number of recipes"""
+        """Count number of recipes"""
 
-        return obj.recipes.all().count()
+        return obj.recipes.count()
 
 # -----------------------------------------------------------------------------
 #                            Recipe app
@@ -195,21 +195,40 @@ class RecipeSerializer(serializers.ModelSerializer):
     def validate(self, data):
         """Validation for recipe creation or modification."""
 
-        tags = self.initial_data.get("tags")
+        tags_ids = self.initial_data.get("tags")
         ingredients = self.initial_data.get("ingredients")
 
-        if not tags or not ingredients:
+        if not tags_ids or not ingredients:
             raise ValidationError("Missing data!")
 
         data.update({
-            "tags": tags,
+            "tags": tags_ids,
             "ingredients": ingredients,
             "author": self.context.get("request").user
         })
         return data
 
+    # def set_ingredients(self, recipe, ingredients):
+    #     models.AmountIngredient.objects.bulk_create(
+    #         models.AmountIngredient(
+    #             recipe=recipe,
+    #             ingredients=ingredient.get('ingredients'),
+    #             amount=ingredient.get('amount')
+    #         ) for ingredient in ingredients)
+
+    def set_ingredients(self, recipe, ingredients):
+
+        objs = []
+        for ingredient, amount in ingredients.values():
+            objs.append(models.AmountIngredient(
+                recipe=recipe,
+                ingredients=ingredient,
+                amount=amount
+            ))
+        models.AmountIngredient.objects.bulk_create(objs)
+
     @atomic
-    def create(self, validated_data: dict):
+    def create(self, validated_data):
         """
         Create recipe.
 
@@ -222,14 +241,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         ingredients = validated_data.pop("ingredients")
         recipe = models.Recipe.objects.create(**validated_data)
         recipe.tags.set(tags)
-        objs = []
-        for ingredient, amount in ingredients.values():
-            objs.append(models.AmountIngredient(
-                recipe=recipe,
-                ingredients=ingredient,
-                amount=amount
-            ))
-        models.AmountIngredient.objects.bulk_create(objs)
+        self.set_ingredients(recipe, ingredients)
         return recipe
 
     @atomic
@@ -254,14 +266,7 @@ class RecipeSerializer(serializers.ModelSerializer):
 
         if ingredients:
             recipe.ingredients.clear()
-            objs = []
-            for ingredient, amount in ingredients.values():
-                objs.append(models.AmountIngredient(
-                    recipe=recipe,
-                    ingredients=ingredient,
-                    amount=amount
-                ))
-            models.AmountIngredient.objects.bulk_create(objs)
+            self.set_ingredients(recipe, ingredients)
 
         recipe.save()
         return recipe

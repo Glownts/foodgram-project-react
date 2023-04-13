@@ -23,7 +23,7 @@ from . import serializers
 from .filters import RecipeFilter
 from .mixins import M2MMixin
 from .permissions import AdminOrReadOnly, AuthorAdminOrReadOnly
-# from rest_framework.routers import APIRootView
+from rest_framework.routers import APIRootView
 
 
 # -----------------------------------------------------------------------------
@@ -31,6 +31,10 @@ from .permissions import AdminOrReadOnly, AuthorAdminOrReadOnly
 # -----------------------------------------------------------------------------
 
 User = get_user_model()
+
+
+class BaseAPIRootView(APIRootView):
+    """Base paths."""
 
 
 class UserViewSet(DjoserUserViewSet, M2MMixin):
@@ -47,29 +51,6 @@ class UserViewSet(DjoserUserViewSet, M2MMixin):
     permission_classes = (AllowAny,)
     add_serializer = serializers.SubscribeSerializer
     pagination_class = PageNumberPagination
-
-    # @action(methods=["get"], detail=False,
-    #         pagination_class=None,
-    #         permission_classes=[IsAuthenticated])
-    # def me(self, request):
-    #     """Defines current user."""
-
-    #     serializer = serializers.UserSerializer(request.user)
-    #     return Response(serializer.data, status=status.HTTP_200_OK)
-
-    # @action(methods=["post"], detail=False,
-    #         permission_classes=[IsAuthenticated])
-    # def set_password(self, request):
-    #     """Allows users to change their passwords."""
-
-    #     serializer = serializers.PasswordSerializer(request.user,
-    #                                                 data=request.data)
-    #     if serializer.is_valid():
-    #         serializer.save()
-    #         return Response({'detail': 'Пароль успешно изменен!'},
-    #                         status=status.HTTP_204_NO_CONTENT)
-    #     return Response(
-    # serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(methods=["get"], detail=False,
             permission_classes=[IsAuthenticated],

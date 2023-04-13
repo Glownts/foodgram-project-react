@@ -133,6 +133,7 @@ class Recipe(models.Model):
         Ingredient,
         verbose_name="ingredients",
         related_name="recipes",
+        through='recipes.AmountIngredient',
     )
     image = models.ImageField(
         verbose_name="image",
@@ -169,21 +170,21 @@ class AmountIngredient(models.Model):
     """
     Model for creating amount of ingredients in recipes.
 
-    Fields: recipe, ingredient, amount.
+    Fields: recipe, ingredients, amount.
 
     "amount" is used to set the amount of ingredients for a particular recipe.
     """
 
-    ingredient = models.ForeignKey(
-        Ingredient,
-        verbose_name="ingredients in recipes",
-        related_name="recipe",
-        on_delete=models.CASCADE,
-    )
     recipe = models.ForeignKey(
         Recipe,
         verbose_name="recipes",
         related_name="ingredient",
+        on_delete=models.CASCADE,
+    )
+    ingredients = models.ForeignKey(
+        Ingredient,
+        verbose_name="ingredients",
+        related_name="recipe",
         on_delete=models.CASCADE,
     )
     amount = models.PositiveIntegerField(
@@ -225,13 +226,13 @@ class ShoppingCart(models.Model):
     user = models.ForeignKey(
         User,
         verbose_name="user",
-        related_name="users_shopping_cart",
+        related_name="shopping_cart",
         on_delete=models.CASCADE,
     )
     recipe = models.ForeignKey(
         Recipe,
         verbose_name="recipes",
-        related_name="recipe_in_shopping_cart",
+        related_name="shopping_cart",
         on_delete=models.CASCADE,
     )
     date_added = models.DateTimeField(
@@ -267,13 +268,13 @@ class Favorite(models.Model):
     user = models.ForeignKey(
         User,
         verbose_name="user",
-        related_name="favorites",
+        related_name="favorite",
         on_delete=models.CASCADE,
     )
     recipe = models.ForeignKey(
         Recipe,
         verbose_name="recipe",
-        related_name="recipes_in_favorite",
+        related_name="favorite",
         on_delete=models.CASCADE,
     )
     date_added = models.DateTimeField(
