@@ -21,7 +21,7 @@ class Tag(models.Model):
     NAME_MAX_LENG and COLOR_MAX_LENG.
 
     "color" has choices that described above: BLUE, RED, GREEN, YELLOW
-    (голубой, красный, зеленый, желтый).
+    (голубой, красный, зеленый, желтый, фиолетовый).
 
     Used ordering by "name" field.
     """
