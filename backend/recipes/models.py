@@ -131,9 +131,9 @@ class Recipe(models.Model):
     )
     ingredients = models.ManyToManyField(
         Ingredient,
+        through='AmountIngredient',
         verbose_name="ingredients",
         related_name="recipes",
-        through='recipes.AmountIngredient',
     )
     image = models.ImageField(
         verbose_name="image",

@@ -39,7 +39,9 @@ class BaseRecipeSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     """Serializer for User model."""
 
-    is_subscribed = serializers.SerializerMethodField()
+    is_subscribed = serializers.SerializerMethodField(
+        method_name="get_is_subscribed"
+    )
 
     class Meta:
         model = User
@@ -82,7 +84,9 @@ class SubscribeSerializer(UserSerializer):
     """Allow to check users subscriptions."""
 
     recipes = BaseRecipeSerializer(many=True, read_only=True)
-    recipes_count = serializers.SerializerMethodField()
+    recipes_count = serializers.SerializerMethodField(
+        method_name="get_recipes_count"
+    )
 
     class Meta:
         model = User
@@ -139,9 +143,15 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     tags = TagSerializer(many=True, read_only=True)
     author = UserSerializer(read_only=True)
-    ingredients = serializers.SerializerMethodField()
-    is_favorited = serializers.SerializerMethodField()
-    is_in_shopping_cart = serializers.SerializerMethodField()
+    ingredients = serializers.SerializerMethodField(
+        method_name="get_ingredients"
+    )
+    is_favorited = serializers.SerializerMethodField(
+        method_name="get_is_favorited"
+    )
+    is_in_shopping_cart = serializers.SerializerMethodField(
+        method_name="get_is_in_shopping_cart"
+    )
     image = Base64ImageField()
 
     class Meta:
@@ -208,24 +218,13 @@ class RecipeSerializer(serializers.ModelSerializer):
         })
         return data
 
-    # def set_ingredients(self, recipe, ingredients):
-    #     models.AmountIngredient.objects.bulk_create(
-    #         models.AmountIngredient(
-    #             recipe=recipe,
-    #             ingredients=ingredient.get('ingredients'),
-    #             amount=ingredient.get('amount')
-    #         ) for ingredient in ingredients)
-
     def set_ingredients(self, recipe, ingredients):
-
-        objs = []
-        for ingredient, amount in ingredients.values():
-            objs.append(models.AmountIngredient(
+        models.AmountIngredient.objects.bulk_create(
+            models.AmountIngredient(
                 recipe=recipe,
-                ingredients=ingredient,
-                amount=amount
-            ))
-        models.AmountIngredient.objects.bulk_create(objs)
+                ingredients=ingredient.get('ingredients'),
+                amount=ingredient.get('amount')
+            ) for ingredient in ingredients)
 
     @atomic
     def create(self, validated_data):
