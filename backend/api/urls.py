@@ -1,5 +1,5 @@
 """
-URL's configuration for api app.
+URL"s configuration for api app.
 """
 
 from django.urls import include, path
@@ -15,6 +15,6 @@ router.register(r"ingredients", views.IngredientViewSet,
                 basename="ingredients")
 
 urlpatterns = [
-    path('', include(router.urls)),
-    path(r'auth/', include('djoser.urls.authtoken')),
+    path("", include(router.urls)),
+    path(r"auth/", include("djoser.urls.authtoken")),
 ]

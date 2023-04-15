@@ -43,19 +43,19 @@ if os.path.exists(dotenv_path):
 
 
 def get_list_allowed(allowed: str) -> list:
-    return [host.strip() for host in allowed.split(',') if host.strip()]
+    return [host.strip() for host in allowed.split(",") if host.strip()]
 
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 DEBUG = os.getenv("DEBUG", default=False)
 DATABASES = {
-    'default': {
-        'ENGINE': os.getenv('DB_ENGINE',),
-        'NAME': os.getenv('DB_NAME',),
-        'USER': os.getenv('POSTGRES_USER',),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD',),
-        'HOST': os.getenv('DB_HOST',),
-        'PORT': os.getenv('DB_PORT',)
+    "default": {
+        "ENGINE": os.getenv("DB_ENGINE",),
+        "NAME": os.getenv("DB_NAME",),
+        "USER": os.getenv("POSTGRES_USER",),
+        "PASSWORD": os.getenv("POSTGRES_PASSWORD",),
+        "HOST": os.getenv("DB_HOST",),
+        "PORT": os.getenv("DB_PORT",)
     }
 }
 
@@ -78,7 +78,7 @@ USE_TZ = True
 ROOT_URLCONF = "backend.urls"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-CSRF_TRUSTED_ORIGINS = ['http://localhost']
+CSRF_TRUSTED_ORIGINS = ["http://localhost"]
 
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
@@ -152,18 +152,18 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 DJOSER = {
-    'HIDE_USERS': False,
-    'PERMISSIONS': {
-        'resipe': ('api.permissions.AuthorAdminOrReadOnly,',),
-        'recipe_list': ('api.permissions.AuthorAdminOrReadOnly',),
-        'user': ('api.permissions.AuthorAdminOrReadOnly',),
-        'user_list': ('api.permissions.AuthorAdminOrReadOnly',),
+    "HIDE_USERS": False,
+    "PERMISSIONS": {
+        "resipe": ("api.permissions.AuthorAdminOrReadOnly,",),
+        "recipe_list": ("api.permissions.AuthorAdminOrReadOnly",),
+        "user": ("api.permissions.AuthorAdminOrReadOnly",),
+        "user_list": ("api.permissions.AuthorAdminOrReadOnly",),
     },
-    'SERIALIZERS': {
-        'user': 'api.serializers.UserSerializer',
-        'user_list': 'api.serializers.UserSerializer',
-        'current_user': 'api.serializers.UserSerializer',
-        'user_create': 'api.serializers.UserSerializer',
+    "SERIALIZERS": {
+        "user": "api.serializers.UserSerializer",
+        "user_list": "api.serializers.UserSerializer",
+        "current_user": "api.serializers.UserSerializer",
+        "user_create": "api.serializers.UserSerializer",
     },
 }
 
@@ -175,8 +175,8 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.TokenAuthentication",
     ],
-    'DEFAULT_FILTER_BACKENDS': [
-        'django_filters.rest_framework.DjangoFilterBackend',
+    "DEFAULT_FILTER_BACKENDS": [
+        "django_filters.rest_framework.DjangoFilterBackend",
     ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination."
     + "PageNumberPagination",

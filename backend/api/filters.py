@@ -44,11 +44,11 @@ class RecipeFilter(FilterSet):
 
 class IngredientFilter(FilterSet):
     """Filter for ingredients by name."""
-    name = filters.CharFilter(method='filter_name')
+    name = filters.CharFilter(method="filter_name")
 
     class Meta:
         model = Ingredient
-        fields = ('name',)
+        fields = ("name",)
 
     def filter_name(self, queryset, name, value):
         """Метод возвращает кверисет с заданным именем ингредиента."""
@@ -59,4 +59,4 @@ class IngredientFilter(FilterSet):
                 Q(name__istartswith=value),
                 output_field=BooleanField()
             )
-        ).order_by('-startswith')
+        ).order_by("-startswith")

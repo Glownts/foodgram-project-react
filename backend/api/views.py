@@ -35,7 +35,7 @@ class UserViewSet(DjoserUserViewSet):
     Has standart pagination. Any users can gat safe methods.
 
     Action-methods: "subscription" and "subscribe" - to check
-    user"s subscription, follow and unfollow authors.
+    users subscription, follow and unfollow authors.
     """
 
     queryset = User.objects.all()
@@ -59,7 +59,7 @@ class UserViewSet(DjoserUserViewSet):
 
         if request.method == "POST":
             if subscription.exists():
-                return Response({"error": "You're alredy subscribed"},
+                return Response({"error": "Youre alredy subscribed"},
                                 status=status.HTTP_400_BAD_REQUEST)
             if user == author:
                 return Response({"error": "Unable to subscribe to yourself"},
@@ -149,20 +149,20 @@ class RecipeViewSet(ModelViewSet):
             user=user, recipe=recipe
         )
 
-        if self.request.method == 'POST':
+        if self.request.method == "POST":
             serializer = serializer_class(
-                data={'user': user.id, 'recipe': pk},
-                context={'request': self.request}
+                data={"user": user.id, "recipe": pk},
+                context={"request": self.request}
             )
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-        if self.request.method == 'DELETE':
+        if self.request.method == "DELETE":
             if object.exists():
                 object.delete()
                 return Response(status=status.HTTP_204_NO_CONTENT)
-            return Response({'error': 'This recipe not in list.'},
+            return Response({"error": "This recipe not in list."},
                             status=status.HTTP_400_BAD_REQUEST)
 
     @action(methods=["GET", "POST", "DELETE"], detail=True)
@@ -195,7 +195,7 @@ class RecipeViewSet(ModelViewSet):
 
         for units in ingredients:
             shopping_list.append(
-                f'{units["name"]}: {units["amount"]} {units["measurement"]}'
+                f"{units['name']}: {units['amount']} {units['measurement']}"
             )
         shopping_list = "\n".join(shopping_list)
         response = HttpResponse(

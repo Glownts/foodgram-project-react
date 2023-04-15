@@ -24,8 +24,8 @@ class User(AbstractUser):
     """
 
     class Roles(models.TextChoices):
-        USER = 'user', 'USER'
-        ADMIN = 'admin', 'ADMIN'
+        USER = "user", "USER"
+        ADMIN = "admin", "ADMIN"
 
     email = models.EmailField(
         verbose_name="email",
@@ -60,15 +60,15 @@ class User(AbstractUser):
         verbose_name="biography",
     )
     role = models.CharField(
-        'role',
+        "role",
         max_length=settings.ROLE_MAX_LENG,
         choices=Roles.choices,
         default=Roles.USER,
         blank=True
     )
 
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ('username', 'first_name', 'last_name')
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = ("username", "first_name", "last_name")
 
     class Meta:
         verbose_name = "User"
@@ -119,8 +119,8 @@ class Subscription(models.Model):
         verbose_name_plural = "Subscriptions"
         constraints = [
             models.UniqueConstraint(
-                fields=['author', 'user'],
-                name='unique_follower')
+                fields=["author", "user"],
+                name="unique_follower")
         ]
 
     def __str__(self):

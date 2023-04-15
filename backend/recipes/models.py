@@ -133,7 +133,7 @@ class Recipe(models.Model):
     )
     ingredients = models.ManyToManyField(
         Ingredient,
-        through='RecipeIngredient',
+        through="RecipeIngredient",
         verbose_name="ingredients",
         related_name="recipe",
     )
@@ -207,14 +207,14 @@ class RecipeIngredient(models.Model):
         ordering = ("recipe", )
         constraints = [
             models.UniqueConstraint(
-                fields=('recipe', 'ingredient'),
-                name='unique ingredient for recipe'
+                fields=("recipe", "ingredient"),
+                name="unique ingredient for recipe"
             )
         ]
 
     def __str__(self):
-        return (f'{self.recipe}: {self.ingredient.name},'
-                f' {self.amount}, {self.ingredient.measurement_unit}')
+        return (f"{self.recipe}: {self.ingredient.name},"
+                f" {self.amount}, {self.ingredient.measurement_unit}")
 
 
 class ShoppingCart(models.Model):
@@ -255,8 +255,8 @@ class ShoppingCart(models.Model):
         ordering = ["-date_added"]
         constraints = (
             models.UniqueConstraint(
-                fields=('user', 'recipe'),
-                name='unique recipe in shopping cart'
+                fields=("user", "recipe"),
+                name="unique recipe in shopping cart"
             ),
         )
 
@@ -302,8 +302,8 @@ class Favorite(models.Model):
         ordering = ["-date_added"]
         constraints = (
             models.UniqueConstraint(
-                fields=('user', 'recipe'),
-                name='unique favorite'
+                fields=("user", "recipe"),
+                name="unique favorite"
             ),
         )
 

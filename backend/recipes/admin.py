@@ -9,30 +9,36 @@ from recipes import models
 
 @register(models.Ingredient)
 class IngredientAdmin(ModelAdmin):
-    list_display = ('name', 'measurement_unit')
-    search_fields = ('name',)
+    """Admin zone registration for Ingredient model."""
+
+    list_display = ("name", "measurement_unit")
+    search_fields = ("name",)
 
 
 @register(models.Tag)
 class TagAdmin(ModelAdmin):
-    list_display = ('name', 'color', 'slug')
+    """Admin zone registration for Tag model."""
+
+    list_display = ("name", "color", "slug")
 
 
 @register(models.Recipe)
 class RecipeAdmin(ModelAdmin):
-    list_display = ('name', 'author', 'pub_date', 'display_tags', 'favorite')
-    list_filter = ('name', 'author', 'tags')
-    search_fields = ('name',)
-    readonly_fields = ('favorite',)
-    fields = ('image',
-              ('name', 'author'),
-              'text',
-              ('tags', 'cooking_time'),
-              'favorite')
+    """Admin zone registration for Recipe model."""
+
+    list_display = ("name", "author", "pub_date", "display_tags", "favorite")
+    list_filter = ("name", "author", "tags")
+    search_fields = ("name",)
+    readonly_fields = ("favorite",)
+    fields = ("image",
+              ("name", "author"),
+              "text",
+              ("tags", "cooking_time"),
+              "favorite")
 
     def display_tags(self, obj):
-        return ', '.join([tag.name for tag in obj.tags.all()])
-    display_tags.short_description = 'Tags'
+        return ", ".join([tag.name for tag in obj.tags.all()])
+    display_tags.short_description = "Tags"
 
     def favorite(self, obj):
         return obj.favorite.count()
@@ -40,14 +46,20 @@ class RecipeAdmin(ModelAdmin):
 
 @register(models.RecipeIngredient)
 class RecipeIngredientAdmin(ModelAdmin):
-    list_display = ('recipe', 'ingredient', 'amount')
+    """Admin zone registration for RecipeIngredient model."""
+
+    list_display = ("recipe", "ingredient", "amount")
 
 
 @register(models.Favorite)
 class FavoriteAdmin(ModelAdmin):
-    list_display = ('recipe', 'user')
+    """Admin zone registration for Favorite model."""
+
+    list_display = ("recipe", "user")
 
 
 @register(models.ShoppingCart)
 class ShoppingCartAdmin(ModelAdmin):
-    list_display = ('recipe', 'user')
+    """Admin zone registration for ShoppingCart model."""
+
+    list_display = ("recipe", "user")
