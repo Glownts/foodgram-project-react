@@ -2,55 +2,52 @@
 Admin zone config recipes.
 """
 
-from django.contrib import admin
+from django.contrib.admin import ModelAdmin, register
 
-from . import models
-
-
-@admin.register(models.Recipe)
-class RecipeAdmin(admin.ModelAdmin):
-    """Admin zone registration for Recipe model."""
-
-    list_display = ("id", "author", "name", "text", "image", "cooking_time")
-    search_fields = ("first_name", "last_name",)
-    list_filter = ("author", "name", "tags",)
-    list_editable = ("author", "name", "text", "image", "cooking_time")
+from recipes import models
 
 
-@admin.register(models.Ingredient)
-class IngredientAdmin(admin.ModelAdmin):
-    """Admin zone registration for Ingredient model."""
-
-    list_display = ("id", "name", "measurement_unit",)
-    list_filter = ("name",)
-    list_editable = ("name", "measurement_unit",)
+@register(models.Ingredient)
+class IngredientAdmin(ModelAdmin):
+    list_display = ('name', 'measurement_unit')
+    search_fields = ('name',)
 
 
-@admin.register(models.ShoppingCart)
-class ShoppingCartAdmin(admin.ModelAdmin):
-    """Admin zone registration for ShoppingCart model."""
-
-    list_display = ("id", "user", "recipe",)
-    list_filter = ("user",)
-    search_fields = ("recipe", "user",)
-    list_editable = ("user", "recipe",)
+@register(models.Tag)
+class TagAdmin(ModelAdmin):
+    list_display = ('name', 'color', 'slug')
 
 
-@admin.register(models.Favorite)
-class FavoriteAdmin(admin.ModelAdmin):
-    """Admin zone registration for Favorite model."""
+@register(models.Recipe)
+class RecipeAdmin(ModelAdmin):
+    list_display = ('name', 'author', 'pub_date', 'display_tags', 'favorite')
+    list_filter = ('name', 'author', 'tags')
+    search_fields = ('name',)
+    readonly_fields = ('favorite',)
+    fields = ('image',
+              ('name', 'author'),
+              'text',
+              ('tags', 'cooking_time'),
+              'favorite')
 
-    list_display = ("id", "user", "recipe",)
-    list_filter = ("user",)
-    search_fields = ("recipe", "user",)
-    list_editable = ("user", "recipe",)
+    def display_tags(self, obj):
+        return ', '.join([tag.name for tag in obj.tags.all()])
+    display_tags.short_description = 'Tags'
+
+    def favorite(self, obj):
+        return obj.favorite.count()
 
 
-@admin.register(models.Tag)
-class TagAdmin(admin.ModelAdmin):
-    """Admin zone registration for Tag model."""
+@register(models.RecipeIngredient)
+class RecipeIngredientAdmin(ModelAdmin):
+    list_display = ('recipe', 'ingredient', 'amount')
 
-    list_display = ("id", "name", "color", "slug",)
-    list_filter = ("name", "color",)
-    search_fields = ("name",)
-    list_editable = ("name", "color", "slug",)
+
+@register(models.Favorite)
+class FavoriteAdmin(ModelAdmin):
+    list_display = ('recipe', 'user')
+
+
+@register(models.ShoppingCart)
+class ShoppingCartAdmin(ModelAdmin):
+    list_display = ('recipe', 'user')

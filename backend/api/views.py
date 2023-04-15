@@ -3,76 +3,91 @@ View-functions.
 """
 
 from django.conf import settings
-from django.contrib.auth import get_user_model
-from django.db.models import Sum, Q, F
 from django.http import HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet as DjoserUserViewSet
 from rest_framework import status
 from rest_framework.decorators import action
-from rest_framework.filters import SearchFilter
-from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from .paginations import CustomPagination
+from rest_framework import permissions
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
+from django.shortcuts import get_object_or_404
+from django.db.models import F, Sum
+
 
 from recipes import models
-from users.models import Subscription
+from users.models import Subscription, User
 
 from . import serializers
-from .filters import RecipeFilter
-from .mixins import M2MMixin
+from .filters import RecipeFilter, IngredientFilter
 from .permissions import AdminOrReadOnly, AuthorAdminOrReadOnly
-from rest_framework.routers import APIRootView
 
 
 # -----------------------------------------------------------------------------
 #                            Users app
 # -----------------------------------------------------------------------------
 
-User = get_user_model()
-
-
-class BaseAPIRootView(APIRootView):
-    """Base paths."""
-
-
-class UserViewSet(DjoserUserViewSet, M2MMixin):
+class UserViewSet(DjoserUserViewSet):
     """
     Viewset for User model.
 
     Has standart pagination. Any users can gat safe methods.
 
     Action-methods: "subscription" and "subscribe" - to check
-    user's subscription, follow and unfollow authors.
+    user"s subscription, follow and unfollow authors.
     """
 
     queryset = User.objects.all()
-    permission_classes = (AllowAny,)
-    add_serializer = serializers.SubscribeSerializer
-    pagination_class = PageNumberPagination
+    serializer_class = serializers.UserSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    pagination_class = CustomPagination
+    http_method_names = ["get", "post", "delete", "head"]
 
-    @action(methods=["get"], detail=False,
-            permission_classes=[IsAuthenticated],
-            pagination_class=PageNumberPagination)
+    def get_permissions(self):
+        if self.action == "me":
+            self.permission_classes = (permissions.IsAuthenticated,)
+        return super().get_permissions()
+
+    @action(methods=["POST", "DELETE"],
+            detail=True, )
+    def subscribe(self, request, id):
+        user = request.user
+        author = get_object_or_404(User, id=id)
+        subscription = Subscription.objects.filter(
+            user=user, author=author)
+
+        if request.method == "POST":
+            if subscription.exists():
+                return Response({"error": "You're alredy subscribed"},
+                                status=status.HTTP_400_BAD_REQUEST)
+            if user == author:
+                return Response({"error": "Unable to subscribe to yourself"},
+                                status=status.HTTP_400_BAD_REQUEST)
+            serializer = serializers.SubscribeSerializer(
+                author,
+                context={"request": request}
+            )
+            Subscription.objects.create(user=user, author=author)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        if request.method == "DELETE":
+            if subscription.exists():
+                subscription.delete()
+                return Response(status=status.HTTP_204_NO_CONTENT)
+            return Response({"error": "Вы не подписаны на этого пользователя"},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, permission_classes=[permissions.IsAuthenticated])
     def subscriptions(self, request):
-        """Shows user's subscriptions."""
-
-        subscriptions = Subscription.objects.filter(user=request.user)
-        page = self.paginate_queryset(subscriptions)
+        user = request.user
+        follows = User.objects.filter(following__user=user)
+        page = self.paginate_queryset(follows)
         serializer = serializers.SubscribeSerializer(
-            page,
-            many=True,
-            context={'request': request}
-        )
+            page, many=True,
+            context={"request": request})
         return self.get_paginated_response(serializer.data)
 
-    @action(methods=["post", "delete"], detail=False,
-            permission_classes=[IsAuthenticated])
-    def subscribe(self, request, **kwargs):
-        """Allows the user to follow and unfollow authors."""
-
-        return self._add_del_obj(id, Subscription, Q(author__id=id))
 
 # -----------------------------------------------------------------------------
 #                            Recipe app
@@ -103,12 +118,12 @@ class IngredientViewSet(ModelViewSet):
     queryset = models.Ingredient.objects.all()
     serializer_class = serializers.IngredientSerializer
     permission_classes = (AdminOrReadOnly,)
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = IngredientFilter
     pagination_class = None
-    filter_backends = (SearchFilter,)
-    search_fields = ("^name",)
 
 
-class RecipeViewSet(ModelViewSet, M2MMixin):
+class RecipeViewSet(ModelViewSet):
     """
     Viewset for Recipe model.
 
@@ -120,42 +135,61 @@ class RecipeViewSet(ModelViewSet, M2MMixin):
     http method.
     """
 
-    queryset = models.Recipe.objects.select_related("author")
+    queryset = models.Recipe.objects.all()
     serializer_class = serializers.RecipeSerializer
     permission_classes = (AuthorAdminOrReadOnly,)
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
-    pagination_class = PageNumberPagination
-    add_serializer = serializers.BaseRecipeSerializer
+    pagination_class = CustomPagination
 
-    @action(methods=['GET', 'POST', 'DELETE'], detail=False,
-            permission_classes=(IsAuthenticated,))
+    def action_post_delete(self, pk, serializer_class):
+        user = self.request.user
+        recipe = get_object_or_404(models.Recipe, pk=pk)
+        object = serializer_class.Meta.model.objects.filter(
+            user=user, recipe=recipe
+        )
+
+        if self.request.method == 'POST':
+            serializer = serializer_class(
+                data={'user': user.id, 'recipe': pk},
+                context={'request': self.request}
+            )
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        if self.request.method == 'DELETE':
+            if object.exists():
+                object.delete()
+                return Response(status=status.HTTP_204_NO_CONTENT)
+            return Response({'error': 'This recipe not in list.'},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+    @action(methods=["GET", "POST", "DELETE"], detail=True)
     def favorite(self, request, pk):
         """Add or delete recipe in favorite list."""
 
-        return self._add_del_obj(pk, models.Favorite, Q(recipe__id=pk))
+        return self.action_post_delete(pk, serializers.FavoriteSerializer)
 
-    @action(methods=['GET', 'POST', 'DELETE'], detail=False,
-            permission_classes=(IsAuthenticated,))
+    @action(methods=["GET", "POST", "DELETE"], detail=True)
     def shopping_cart(self, request, pk):
         """Add or delete recipe in shop list."""
 
-        return self._add_del_obj(pk, models.ShoppingCart, Q(recipe__id=pk))
+        return self.action_post_delete(pk, serializers.ShoppingCartSerializer)
 
-    @action(methods=['GET'], detail=False)
+    @action(methods=["GET"], detail=False)
     def download_shopping_cart(self, request):
         """Dowload shop list in [FILE_NAME].txt file."""
 
         user = self.request.user
-        if not user.carts.exists():
+        if not user.shopping_cart.exists():
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
-        ingredients = models.Ingredient.objects.filter(
-            recipe__recipe__recipe_in_shopping_cart__user=user
-        ).values(
-            'name',
-            measurement=F('measurement_unit')
-        ).annotate(amount=Sum('recipe__amount'))
+        ingredients = models.RecipeIngredient.objects.filter(
+            recipe__shopping_cart__user=request.user).values(
+            name=F("ingredient__name"),
+            measurement=F("ingredient__measurement_unit")
+        ).annotate(amount=Sum("amount"))
 
         shopping_list = []
 
@@ -163,10 +197,10 @@ class RecipeViewSet(ModelViewSet, M2MMixin):
             shopping_list.append(
                 f'{units["name"]}: {units["amount"]} {units["measurement"]}'
             )
-
+        shopping_list = "\n".join(shopping_list)
         response = HttpResponse(
-            shopping_list, content_type='text.txt; charset=utf-8'
+            shopping_list, content_type="text.txt; charset=utf-8"
         )
-        response['Content-Disposition'] = ('attachment; '
-                                           + f'filename={settings.FILE_NAME}')
+        response["Content-Disposition"] = ("attachment; "
+                                           + f"filename={settings.FILE_NAME}")
         return response

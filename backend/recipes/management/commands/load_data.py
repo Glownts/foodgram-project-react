@@ -2,9 +2,11 @@
 Custom manage-commands.
 """
 
+import csv
+
 from django.core.management import BaseCommand
 
-from recipes.models import Ingredient
+from recipes.models import Ingredient, Tag
 
 
 ALREDY_LOADED_ERROR_MESSAGE = """
@@ -14,6 +16,10 @@ Then, run `python manage.py migrate` for a new empty
 database with tables"""
 
 DIR = './data/'
+MODELS_FILES = {
+    Ingredient: 'ingredients.csv',
+    Tag: 'tags.csv',
+}
 
 
 class Command(BaseCommand):
@@ -26,18 +32,19 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        if Ingredient.objects.exists():
+        if Ingredient.objects.exists() or Tag.objects.exists():
             print('Data already exists.')
             print(ALREDY_LOADED_ERROR_MESSAGE)
             return
 
         print("Loading data...")
 
-        for row in open(DIR + 'ingredients.csv'):
-            data = row.split(",")
-            Ingredient.objects.get_or_create(
-                name=data[0],
-                measurement_unit=data[1]
-            )
+        for model, file in MODELS_FILES.items():
+            with open(
+                    f'{DIR}/{file}',
+                    'r', encoding='utf-8',
+            ) as table:
+                reader = csv.DictReader(table)
+                model.objects.bulk_create(model(**data) for data in reader)
 
         print("Loading data complete")

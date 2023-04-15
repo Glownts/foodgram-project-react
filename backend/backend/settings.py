@@ -7,6 +7,9 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
 # -----------------------------------------------------------------------------
 #                            Changable settings
 # -----------------------------------------------------------------------------
@@ -31,18 +34,36 @@ OBJECTS_PER_PAGE = 6
 FILE_NAME = "shopping_list.txt"
 
 # -----------------------------------------------------------------------------
-#                            Base settings
+#                            .env settings
 # -----------------------------------------------------------------------------
-
-BASE_DIR = Path(__file__).resolve().parent.parent
 
 dotenv_path = os.path.join(BASE_DIR, "../infra/.env")
 if os.path.exists(dotenv_path):
     load_dotenv(dotenv_path)
 
-SECRET_KEY = os.getenv("SECRET_KEY")
 
-DEBUG = True
+def get_list_allowed(allowed: str) -> list:
+    return [host.strip() for host in allowed.split(',') if host.strip()]
+
+
+SECRET_KEY = os.getenv("SECRET_KEY")
+DEBUG = os.getenv("DEBUG", default=False)
+DATABASES = {
+    'default': {
+        'ENGINE': os.getenv('DB_ENGINE',),
+        'NAME': os.getenv('DB_NAME',),
+        'USER': os.getenv('POSTGRES_USER',),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD',),
+        'HOST': os.getenv('DB_HOST',),
+        'PORT': os.getenv('DB_PORT',)
+    }
+}
+
+# -----------------------------------------------------------------------------
+#                            Base settings
+# -----------------------------------------------------------------------------
+
+ALLOWED_HOSTS = ["*"]
 
 AUTH_USER_MODEL = "users.User"
 
@@ -54,19 +75,16 @@ USE_I18N = True
 
 USE_TZ = True
 
+ROOT_URLCONF = "backend.urls"
+
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+CSRF_TRUSTED_ORIGINS = ['http://localhost']
 
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
-
-
-DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-CSRF_TRUSTED_ORIGINS = ['http://localhost']
-
-
-ALLOWED_HOSTS = ["*"]
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -75,9 +93,11 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+
     "recipes.apps.RecipesConfig",
     "users.apps.UsersConfig",
     "api.apps.ApiConfig",
+
     "django_filters",
     "rest_framework",
     "rest_framework.authtoken",
@@ -93,8 +113,6 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
-
-ROOT_URLCONF = "backend.urls"
 
 TEMPLATES = [
     {
@@ -114,19 +132,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "backend.wsgi.application"
 
-
-DATABASES = {
-    'default': {
-        'ENGINE': os.getenv('DB_ENGINE',),
-        'NAME': os.getenv('DB_NAME',),
-        'USER': os.getenv('POSTGRES_USER',),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD',),
-        'HOST': os.getenv('DB_HOST',),
-        'PORT': os.getenv('DB_PORT',)
-    }
-}
-
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation."
@@ -145,7 +150,6 @@ AUTH_PASSWORD_VALIDATORS = [
         + "NumericPasswordValidator",
     },
 ]
-
 
 DJOSER = {
     'HIDE_USERS': False,

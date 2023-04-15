@@ -6,6 +6,7 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.db import models
+from rest_framework.exceptions import ValidationError
 
 
 class User(AbstractUser):
@@ -98,13 +99,13 @@ class Subscription(models.Model):
     user = models.ForeignKey(
         User,
         verbose_name="subscriber",
-        related_name="subscriptions",
+        related_name="follower",
         on_delete=models.CASCADE,
     )
     author = models.ForeignKey(
         User,
         verbose_name="author",
-        related_name="subscribers",
+        related_name="following",
         on_delete=models.CASCADE,
     )
     date_added = models.DateTimeField(
@@ -116,7 +117,16 @@ class Subscription(models.Model):
     class Meta:
         verbose_name = "Subscription"
         verbose_name_plural = "Subscriptions"
-        unique_together = ("user", "author",)
+        constraints = [
+            models.UniqueConstraint(
+                fields=['author', 'user'],
+                name='unique_follower')
+        ]
 
     def __str__(self):
         return f"{self.user.username} subscribed to {self.author.username}"
+
+    def save(self, **kwargs):
+        if self.user == self.author:
+            raise ValidationError("Невозможно подписаться на себя")
+        super().save()

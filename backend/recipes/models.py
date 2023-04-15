@@ -4,10 +4,12 @@ wish-lists and favorites.
 """
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 
-from users.models import User
+
+User = get_user_model()
 
 
 class Tag(models.Model):
@@ -131,9 +133,9 @@ class Recipe(models.Model):
     )
     ingredients = models.ManyToManyField(
         Ingredient,
-        through='AmountIngredient',
+        through='RecipeIngredient',
         verbose_name="ingredients",
-        related_name="recipes",
+        related_name="recipe",
     )
     image = models.ImageField(
         verbose_name="image",
@@ -166,7 +168,7 @@ class Recipe(models.Model):
         return f"{self.name}. Author: {self.author.username}"
 
 
-class AmountIngredient(models.Model):
+class RecipeIngredient(models.Model):
     """
     Model for creating amount of ingredients in recipes.
 
@@ -178,16 +180,15 @@ class AmountIngredient(models.Model):
     recipe = models.ForeignKey(
         Recipe,
         verbose_name="recipes",
-        related_name="ingredient",
+        related_name="recipe_ingredient",
         on_delete=models.CASCADE,
     )
-    ingredients = models.ForeignKey(
+    ingredient = models.ForeignKey(
         Ingredient,
-        verbose_name="ingredients",
-        related_name="recipe",
+        verbose_name="ingredient",
         on_delete=models.CASCADE,
     )
-    amount = models.PositiveIntegerField(
+    amount = models.PositiveSmallIntegerField(
         verbose_name="amount",
         default=0,
         validators=(
@@ -201,12 +202,19 @@ class AmountIngredient(models.Model):
     )
 
     class Meta:
-        verbose_name = "Ingredients in recipe"
+        verbose_name = "Ingredient in recipe"
         verbose_name_plural = verbose_name
         ordering = ("recipe", )
+        constraints = [
+            models.UniqueConstraint(
+                fields=('recipe', 'ingredient'),
+                name='unique ingredient for recipe'
+            )
+        ]
 
     def __str__(self):
-        return f"{self.amount} {self.ingredients}"
+        return (f'{self.recipe}: {self.ingredient.name},'
+                f' {self.amount}, {self.ingredient.measurement_unit}')
 
 
 class ShoppingCart(models.Model):
@@ -244,8 +252,13 @@ class ShoppingCart(models.Model):
     class Meta:
         verbose_name = "Recipes in shopping cart"
         verbose_name_plural = verbose_name
-        unique_together = ("user", "recipe",)
         ordering = ["-date_added"]
+        constraints = (
+            models.UniqueConstraint(
+                fields=('user', 'recipe'),
+                name='unique recipe in shopping cart'
+            ),
+        )
 
     def __str__(self):
         return f"{self.user} added {self.recipe}"
@@ -286,8 +299,13 @@ class Favorite(models.Model):
     class Meta:
         verbose_name = "Recipes in favorite"
         verbose_name_plural = verbose_name
-        unique_together = ("user", "recipe",)
         ordering = ["-date_added"]
+        constraints = (
+            models.UniqueConstraint(
+                fields=('user', 'recipe'),
+                name='unique favorite'
+            ),
+        )
 
     def __str__(self):
         return f"{self.user} added {self.recipe}"

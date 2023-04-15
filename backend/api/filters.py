@@ -2,8 +2,8 @@
 Filters for views.
 """
 from django_filters.rest_framework import FilterSet, filters
-
-from recipes.models import Recipe, Tag
+from django.db.models import BooleanField, ExpressionWrapper, Q
+from recipes.models import Recipe, Tag, Ingredient
 
 
 class RecipeFilter(FilterSet):
@@ -40,3 +40,23 @@ class RecipeFilter(FilterSet):
         if value and user.is_authenticated:
             return queryset.filter(shopping_cart__user=user)
         return queryset
+
+
+class IngredientFilter(FilterSet):
+    """Filter for ingredients by name."""
+    name = filters.CharFilter(method='filter_name')
+
+    class Meta:
+        model = Ingredient
+        fields = ('name',)
+
+    def filter_name(self, queryset, name, value):
+        """Метод возвращает кверисет с заданным именем ингредиента."""
+        return queryset.filter(
+            Q(name__istartswith=value) | Q(name__icontains=value)
+        ).annotate(
+            startswith=ExpressionWrapper(
+                Q(name__istartswith=value),
+                output_field=BooleanField()
+            )
+        ).order_by('-startswith')
