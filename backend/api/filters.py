@@ -1,9 +1,9 @@
 """
 Filters for views.
 """
-from django_filters.rest_framework import FilterSet, filters
 from django.db.models import BooleanField, ExpressionWrapper, Q
-from recipes.models import Recipe, Tag, Ingredient
+from django_filters.rest_framework import FilterSet, filters
+from recipes.models import Ingredient, Recipe, Tag
 
 
 class RecipeFilter(FilterSet):

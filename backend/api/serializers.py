@@ -2,17 +2,17 @@
 Serializers.
 """
 
-from drf_extra_fields.fields import Base64ImageField
 from django.core.exceptions import ValidationError
 from django.db.transaction import atomic
-from rest_framework import serializers
+from drf_extra_fields.fields import Base64ImageField
 from recipes import models
-from users.models import User, Subscription
-
+from rest_framework import serializers
+from users.models import Subscription, User
 
 # -----------------------------------------------------------------------------
 #                            Users app
 # -----------------------------------------------------------------------------
+
 
 class BaseRecipeSerializer(serializers.ModelSerializer):
     """Cut version of recipe serializer just for subscriptions."""

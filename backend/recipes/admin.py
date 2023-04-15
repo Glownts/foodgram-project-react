@@ -3,7 +3,6 @@ Admin zone config recipes.
 """
 
 from django.contrib.admin import ModelAdmin, register
-
 from recipes import models
 
 

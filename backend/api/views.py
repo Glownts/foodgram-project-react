@@ -3,30 +3,27 @@ View-functions.
 """
 
 from django.conf import settings
+from django.db.models import F, Sum
 from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet as DjoserUserViewSet
-from rest_framework import status
+from recipes import models
+from rest_framework import permissions, status
 from rest_framework.decorators import action
-from .paginations import CustomPagination
-from rest_framework import permissions
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
-from django.shortcuts import get_object_or_404
-from django.db.models import F, Sum
-
-
-from recipes import models
 from users.models import Subscription, User
 
 from . import serializers
-from .filters import RecipeFilter, IngredientFilter
+from .filters import IngredientFilter, RecipeFilter
+from .paginations import CustomPagination
 from .permissions import AdminOrReadOnly, AuthorAdminOrReadOnly
-
 
 # -----------------------------------------------------------------------------
 #                            Users app
 # -----------------------------------------------------------------------------
+
 
 class UserViewSet(DjoserUserViewSet):
     """
