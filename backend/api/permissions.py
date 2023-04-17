@@ -1,4 +1,3 @@
-
 """
 User's permissions.
 """
@@ -21,9 +20,6 @@ class AdminOrReadOnly(permissions.BasePermission):
             request.method in permissions.SAFE_METHODS
             or self._is_admin
         )
-
-    def has_object_permission(self, request, view, obj):
-        return self.has_permission
 
 
 class AuthorAdminOrReadOnly(permissions.BasePermission):
