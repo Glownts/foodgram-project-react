@@ -2,11 +2,13 @@
 Serializers.
 """
 
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db.transaction import atomic
 from drf_extra_fields.fields import Base64ImageField
-from recipes import models
 from rest_framework import serializers
+
+from recipes import models
 from users.models import Subscription, User
 
 # -----------------------------------------------------------------------------
@@ -68,10 +70,8 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
     def validate_username(self, value):
-        if value == "me":
-            raise ValidationError(
-                "Unable to create user wwith this username!"
-            )
+        if value in settings.PROHIBITED_NAMES:
+            raise ValidationError("Unable to create user with this username!")
         return value
 
 
@@ -188,9 +188,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             len(list_ingredients), len(set(list_ingredients)))
 
         if all_ingredients != distinct_ingredients:
-            raise ValidationError(
-                {"error": "Ingredients should be unique!"}
-            )
+            raise ValidationError("Ingredients should be unique!")
         return data
 
     def get_ingredients(self, recipe, ingredients):
@@ -279,9 +277,7 @@ class FavoriteSerializer(serializers.ModelSerializer):
     def validate(self, data):
         user, recipe = data.get("user"), data.get("recipe")
         if self.Meta.model.objects.filter(user=user, recipe=recipe).exists():
-            raise ValidationError(
-                {"error": "This recipe alredy in list!"}
-            )
+            raise ValidationError("This recipe alredy in list!")
         return data
 
     def to_representation(self, instance):
