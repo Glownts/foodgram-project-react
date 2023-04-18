@@ -128,5 +128,5 @@ class Subscription(models.Model):
 
     def save(self, **kwargs):
         if self.user == self.author:
-            raise ValidationError("Невозможно подписаться на себя")
+            raise ValidationError(settings.SELF_SUBSCRIPTION)
         super().save()

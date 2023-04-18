@@ -46,6 +46,7 @@ class RecipeFilter(FilterSet):
 
 class IngredientFilter(FilterSet):
     """Filter for ingredients by name."""
+
     name = filters.CharFilter(method="filter_name")
 
     class Meta:
@@ -53,7 +54,8 @@ class IngredientFilter(FilterSet):
         fields = ("name",)
 
     def filter_name(self, queryset, name, value):
-        """Метод возвращает кверисет с заданным именем ингредиента."""
+        """Returns queryset with selected name."""
+
         return queryset.filter(
             Q(name__istartswith=value) | Q(name__icontains=value)
         ).annotate(

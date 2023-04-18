@@ -57,3 +57,4 @@ uritemplate==4.1.1
 urllib3==1.26.15
 zope.event==4.6
 zope.interface==6.0
+progress==1.6

@@ -14,6 +14,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 #                            Changable settings
 # -----------------------------------------------------------------------------
 
+# Min and max sizes
 NAME_MAX_LENG = 200
 USER_MAX_LENG = 150
 TEXT_MAX_LENG = 1000
@@ -22,18 +23,34 @@ SLUG_MAX_LENG = 200
 EMAIL_MAX_LENG = 254
 COLOR_MAX_LENG = 7
 ROLE_MAX_LENG = 5
-
-COOKING_TIME_MIN = 1
 COOKING_TIME_MAX = 300
-
-MIN_AMOUNT_INGREDIENTS = 1
+COOKING_TIME_MIN = 1
 MAX_AMOUNT_INGREDIENTS = 5000
+MIN_AMOUNT_INGREDIENTS = 1
 
+# Pagination settings
 OBJECTS_PER_PAGE = 6
 
+# Download file settings
 FILE_NAME = "shopping_list.txt"
 
+# Objects creating settings
 PROHIBITED_NAMES = ("me", "you", "user",)
+USERNAME_ERROR = "Unable to create user with this username!"
+SELF_SUBSCRIPTION = "Unable to subscribe to yourself."
+COOKING_TIME_ERROR = "Cooking time is too short."
+TAGS_ERROR = "Need one or more tags or tags not unique."
+INGREDIENTS_ERROR = "Need one or more ingredients or Ingredients not unique."
+AMOUNT_ERROR = "Need more ingredients amount."
+RECIPE_ERROR = "This recipe alredy in list!"
+
+# Database filling error
+HELP_MESSAGE = "Loads data from .csv-files"
+DIRECTION_OF_FILES = './data/'
+ALREDY_LOADED_ERROR_MESSAGE = """Data already exists.
+If you need to reload data from the CSV file,
+first destroy the database. Then, run `python manage.py migrate`
+for a new empty database with tables"""
 
 # -----------------------------------------------------------------------------
 #                            .env settings

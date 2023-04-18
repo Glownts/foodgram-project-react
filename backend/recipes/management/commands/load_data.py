@@ -5,16 +5,11 @@ Custom manage-commands.
 import csv
 
 from django.core.management import BaseCommand
+from django.conf import settings
 
 from recipes.models import Ingredient, Tag
 
-ALREDY_LOADED_ERROR_MESSAGE = """
-If you need to reload data from the CSV file,
-first delete the db.sqlite3 file to destroy the database.
-Then, run `python manage.py migrate` for a new empty
-database with tables"""
 
-DIR = './data/'
 MODELS_FILES = {
     Ingredient: 'ingredients.csv',
     Tag: 'tags.csv',
@@ -27,20 +22,19 @@ class Command(BaseCommand):
     Raise ALREDY_LOADED_ERROR_MESSAGE if data exists in DB.
     '''
 
-    help = "Loads data from .csv-files"
+    help = settings.HELP_MESSAGE
 
     def handle(self, *args, **options):
 
         if Ingredient.objects.exists() or Tag.objects.exists():
-            print('Data already exists.')
-            print(ALREDY_LOADED_ERROR_MESSAGE)
+            print(settings.ALREDY_LOADED_ERROR_MESSAGE)
             return
 
         print("Loading data...")
 
         for model, file in MODELS_FILES.items():
             with open(
-                    f'{DIR}/{file}',
+                    f'{settings.DIRECTION_OF_FILES}/{file}',
                     'r', encoding='utf-8',
             ) as table:
                 reader = csv.DictReader(table)

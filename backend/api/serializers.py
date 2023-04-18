@@ -71,7 +71,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     def validate_username(self, value):
         if value in settings.PROHIBITED_NAMES:
-            raise ValidationError("Unable to create user with this username!")
+            raise ValidationError(settings.USERNAME_ERROR)
         return value
 
 
@@ -165,6 +165,7 @@ class AddIngredientSerializer(serializers.ModelSerializer):
 
 class RecipeSerializer(serializers.ModelSerializer):
     """Serializer for recipes."""
+
     author = UserSerializer(read_only=True)
     image = Base64ImageField()
     ingredients = AddIngredientSerializer(many=True)
@@ -182,14 +183,25 @@ class RecipeSerializer(serializers.ModelSerializer):
             "cooking_time"
         )
 
-# Оставил без изменений, не дождавшись ответа в пачке
     def validate(self, data):
-        list_ingredients = [item["ingredient"] for item in data["ingredients"]]
-        all_ingredients, distinct_ingredients = (
-            len(list_ingredients), len(set(list_ingredients)))
+        """Validation."""
 
-        if all_ingredients != distinct_ingredients:
-            raise ValidationError("Ingredients should be unique!")
+        cooking_time = data["cooking_time"]
+        tags = data["tags"]
+        ingredients = data["ingredients"]
+        id_list = []
+
+        for ingredient in ingredients:
+            if ingredient["amount"] < settings.MIN_AMOUNT_INGREDIENTS:
+                raise ValidationError(settings.AMOUNT_ERROR)
+            id_list.append(ingredient.get("id"))
+
+        if len(ingredients) == 0 or len(id_list) > len(set(id_list)):
+            raise ValidationError(settings.INGREDIENTS_ERROR)
+        if len(tags) == 0 or len(tags) > len(set(tags)):
+            raise ValidationError(settings.TAGS_ERROR)
+        if cooking_time < settings.COOKING_TIME_MIN:
+            raise ValidationError(settings.COOKING_TIME_ERROR)
         return data
 
     def get_ingredients(self, recipe, ingredients):
@@ -231,6 +243,8 @@ class RecipeSerializer(serializers.ModelSerializer):
         return super().update(instance, validated_data)
 
     def to_representation(self, instance):
+        """Method for representation recipes."""
+
         context = {"request": self.context.get("request")}
         return GetRecipeSerializer(instance, context=context).data
 
@@ -256,12 +270,16 @@ class GetRecipeSerializer(serializers.ModelSerializer):
                   "name", "image", "text", "cooking_time")
 
     def get_is_favorited(self, object):
+        """Method for getting favorited recipes."""
+
         user = self.context.get("request").user
         if user.is_anonymous:
             return False
         return object.favorite.filter(user=user).exists()
 
     def get_is_in_shopping_cart(self, object):
+        """Method for getting recipes in shoppeng cart."""
+
         user = self.context.get("request").user
         if user.is_anonymous:
             return False
@@ -276,12 +294,16 @@ class FavoriteSerializer(serializers.ModelSerializer):
         fields = ("user", "recipe")
 
     def validate(self, data):
+        """Validation."""
+
         user, recipe = data.get("user"), data.get("recipe")
         if self.Meta.model.objects.filter(user=user, recipe=recipe).exists():
-            raise ValidationError("This recipe alredy in list!")
+            raise ValidationError(settings.RECIPE_ERROR)
         return data
 
     def to_representation(self, instance):
+        """Method for representation favorite list."""
+
         context = {"request": self.context.get("request")}
         return BaseRecipeSerializer(instance.recipe, context=context).data
 
