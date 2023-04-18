@@ -182,6 +182,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             "cooking_time"
         )
 
+# Оставил без изменений, не дождавшись ответа в пачке
     def validate(self, data):
         list_ingredients = [item["ingredient"] for item in data["ingredients"]]
         all_ingredients, distinct_ingredients = (
