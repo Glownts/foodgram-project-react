@@ -8,8 +8,8 @@ from django.db.transaction import atomic
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 
-from recipes import models
-from users.models import Subscription, User
+from ..recipes import models
+from ..users.models import Subscription, User
 
 # -----------------------------------------------------------------------------
 #                            Users app
@@ -196,9 +196,9 @@ class RecipeSerializer(serializers.ModelSerializer):
                 raise ValidationError(settings.AMOUNT_ERROR)
             id_list.append(ingredient.get("id"))
 
-        if len(ingredients) == 0 or len(id_list) > len(set(id_list)):
+        if len(id_list) == 0 or len(id_list) != len(set(id_list)):
             raise ValidationError(settings.INGREDIENTS_ERROR)
-        if len(tags) == 0 or len(tags) > len(set(tags)):
+        if len(tags) == 0 or len(tags) != len(set(tags)):
             raise ValidationError(settings.TAGS_ERROR)
         if cooking_time < settings.COOKING_TIME_MIN:
             raise ValidationError(settings.COOKING_TIME_ERROR)
