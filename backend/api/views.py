@@ -13,8 +13,9 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
-from ..recipes import models
-from ..users.models import Subscription, User
+from recipes import models
+from users.models import Subscription, User
+
 from . import serializers
 from .filters import IngredientFilter, RecipeFilter
 from .paginations import CustomPagination

@@ -10,7 +10,9 @@ services:
       - ./.env
 
   backend:
-    image: glownt/foodgram_backend
+    # image: glownt/foodgram_backend
+    build:
+        context: ../backend
     restart: always
     volumes:
       - static_value:/app/static/
