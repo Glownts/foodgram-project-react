@@ -50,7 +50,7 @@ INGREDIENTS_ERROR = "Need one or more ingredients or Ingredients not unique."
 AMOUNT_ERROR = "Need more ingredients amount."
 RECIPE_ERROR = "This recipe alredy in list!"
 
-# Database filling error
+# Database filling info
 HELP_MESSAGE = "Loads data from .csv-files"
 DIRECTION_OF_FILES = './data/'
 ALREDY_LOADED_ERROR_MESSAGE = """Data already exists.
