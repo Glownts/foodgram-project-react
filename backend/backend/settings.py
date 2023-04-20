@@ -96,7 +96,10 @@ USE_TZ = True
 ROOT_URLCONF = "backend.urls"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-CSRF_TRUSTED_ORIGINS = ["http://localhost"]
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost",
+    "http://51.250.94.126",
+]
 
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
