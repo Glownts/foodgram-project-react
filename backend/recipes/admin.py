@@ -2,7 +2,7 @@
 Admin zone config recipes.
 """
 
-from django.contrib.admin import ModelAdmin, register, TabularInline
+from django.contrib.admin import ModelAdmin, TabularInline, register
 
 from recipes import models
 

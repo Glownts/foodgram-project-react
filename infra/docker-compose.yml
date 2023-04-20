@@ -10,12 +10,8 @@ services:
       - ./.env
 
   backend:
-    container_name: backend
+    image: glownt/foodgram-backend:latest
     restart: always
-    build:
-      context: ../backend
-    expose:
-      - 8000
     volumes:
       - static_value:/app/static/
       - media_value:/app/media/
@@ -25,9 +21,7 @@ services:
       - ./.env
 
   frontend:
-    container_name: frontend
-    build:
-      context: ../frontend
+    image: glownt/foodgram-frontend:latest
     volumes:
       - ../frontend/:/app/result_build/
 
