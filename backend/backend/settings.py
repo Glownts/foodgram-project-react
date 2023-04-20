@@ -65,7 +65,6 @@ def get_list_allowed(allowed: str) -> list:
 
 
 SECRET_KEY = os.getenv("SECRET_KEY")
-DEBUG = os.getenv("DEBUG", default=False)
 DATABASES = {
     "default": {
         "ENGINE": os.getenv("DB_ENGINE",),
@@ -82,6 +81,8 @@ DATABASES = {
 # -----------------------------------------------------------------------------
 
 ALLOWED_HOSTS = ["*"]
+
+DEBUG = False
 
 AUTH_USER_MODEL = "users.User"
 
