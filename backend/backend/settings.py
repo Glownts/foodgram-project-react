@@ -1,5 +1,12 @@
 """
-Django settings for backend project.
+Django settings for backend.
+
+Has several parts: Changable settings, .env settings and
+Base settings.
+Changable settings - settings that used to configurate
+minor moments.
+.env settings - imports of secret data.
+Base settings - recomended not to touch.
 """
 
 import os

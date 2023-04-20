@@ -10,7 +10,7 @@ services:
       - ./.env
 
   backend:
-    image: glownt/foodgram_backend:latest
+    image: glownt/foodgram_backend
     restart: always
     volumes:
       - static_value:/app/static/
@@ -21,7 +21,7 @@ services:
       - ./.env
 
   frontend:
-    image: glownt/foodgram_frontend:latest
+    image: glownt/foodgram_frontend
     volumes:
       - ../frontend/:/app/result_build/
 
