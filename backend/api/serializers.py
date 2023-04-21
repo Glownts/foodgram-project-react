@@ -189,14 +189,14 @@ class RecipeSerializer(serializers.ModelSerializer):
         cooking_time = data["cooking_time"]
         tags = data["tags"]
         ingredients = data["ingredients"]
-        id_list = []
+        list_ing = []
 
         for ingredient in ingredients:
             if ingredient["amount"] < settings.MIN_AMOUNT_INGREDIENTS:
                 raise ValidationError(settings.AMOUNT_ERROR)
-            id_list.append(ingredient.get("id"))
+            list_ing.append(ingredient["ingredient"])
 
-        if len(id_list) == 0:
+        if len(list_ing) == 0 or len(list_ing) != len(set(list_ing)):
             raise ValidationError(settings.INGREDIENTS_ERROR)
         if len(tags) == 0 or len(tags) != len(set(tags)):
             raise ValidationError(settings.TAGS_ERROR)

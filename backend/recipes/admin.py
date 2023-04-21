@@ -10,6 +10,7 @@ from recipes import models
 class IngredientInline(TabularInline):
     model = models.RecipeIngredient
     extra = 2
+    min_num = 1
 
 
 @register(models.Ingredient)
